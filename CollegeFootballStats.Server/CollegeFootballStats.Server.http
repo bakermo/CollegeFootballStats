@@ -1,0 +1,6 @@
+@CollegeFootballStats.Server_HostAddress = http://localhost:5232
+
+GET {{CollegeFootballStats.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
