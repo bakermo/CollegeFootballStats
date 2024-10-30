@@ -7,5 +7,6 @@ declare module 'lucide-react' {
     }
     export type LucideIcon = FC<LucideProps>
     export const Menu: LucideIcon
+    export const ArrowLeft: LucideIcon
     // Add other icons you plan to use
   }
