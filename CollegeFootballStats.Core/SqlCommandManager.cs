@@ -32,5 +32,20 @@ namespace CollegeFootballStats.Core
 
             return Task.CompletedTask;
         }
+
+        public Task RollBackChanges()
+        {
+            using var conn = new OracleConnection(_connectionString);
+            conn.Execute("ROLLBACK");
+            return Task.CompletedTask;
+        }
+
+        public Task CommitChanges()
+        {
+            using var conn = new OracleConnection(_connectionString);
+            conn.Execute("COMMIT");
+
+            return Task.CompletedTask;
+        }
     }
 }

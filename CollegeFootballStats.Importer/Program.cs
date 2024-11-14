@@ -91,13 +91,14 @@ while (actionChoice != (int)ImporterAction.Exit)
             }
             if (importer != null)
             {
+                importer = new Committer(importerConfig, importerLogger);
                 await importer.ImportAsync();
                 Console.WriteLine("Import complete. DON'T FORGET TO COMMIT YOUR CHANGES!");
             }
             break;
         case ImporterAction.CommitChanges:
             Console.WriteLine("Committing changes, please wait...");
-            //await importer.CommitChangesAsync();
+            
             Console.WriteLine("Changes committed.");
             break;
         default:
@@ -114,7 +115,7 @@ int GetImportAction()
     int importActionChoice = 0;
     while (!validImportAction)
     {
-        Console.WriteLine("\nChoose an import type: ");
+        Console.WriteLine("\nChoose an import type (Enter the number): ");
         Enum.GetValues<ImportType>().ToList().ForEach(importType =>
         {
             Console.WriteLine($"{(int)importType}: {importType}");
@@ -137,7 +138,7 @@ int GetAction()
     int actionChoice = 0;
     while (!validAction)
     {
-        Console.WriteLine("\nChoose an action: ");
+        Console.WriteLine("\nChoose an action: (Enter the number");
         Enum.GetValues<ImporterAction>().ToList().ForEach(action =>
         {
             Console.WriteLine($"{(int)action}: {action}");
