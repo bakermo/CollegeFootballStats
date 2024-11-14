@@ -1,4 +1,4 @@
-﻿namespace CollegeFootballStats.Server
+﻿namespace CollegeFootballStats.Core
 {
     public abstract class QueryBase : IQuery
     {

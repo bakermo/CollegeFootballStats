@@ -1,6 +1,6 @@
-using CollegeFootballStats.Server.Queries;
-using CollegeFootballStats.Server.Models;
-using CollegeFootballStats.Server;
+using CollegeFootballStats.Core.Queries;
+using CollegeFootballStats.Core.Models;
+using CollegeFootballStats.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 

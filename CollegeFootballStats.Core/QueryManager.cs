@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Oracle.ManagedDataAccess.Client;
 
-namespace CollegeFootballStats.Server
+namespace CollegeFootballStats.Core
 {
     public class QueryManager
     {

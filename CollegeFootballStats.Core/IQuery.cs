@@ -1,4 +1,4 @@
-﻿namespace CollegeFootballStats.Server
+﻿namespace CollegeFootballStats.Core
 {
     public interface IQuery
     {

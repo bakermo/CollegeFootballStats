@@ -1,4 +1,4 @@
-﻿namespace CollegeFootballStats.Server.Models
+﻿namespace CollegeFootballStats.Core.Models
 {
     public class Team
     {
