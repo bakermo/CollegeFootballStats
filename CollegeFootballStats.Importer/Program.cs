@@ -91,14 +91,14 @@ while (actionChoice != (int)ImporterAction.Exit)
             }
             if (importer != null)
             {
-                importer = new Committer(importerConfig, importerLogger);
+                Console.WriteLine("\nImporting data, please wait...");
                 await importer.ImportAsync();
                 Console.WriteLine("Import complete. DON'T FORGET TO COMMIT YOUR CHANGES!");
             }
             break;
         case ImporterAction.CommitChanges:
             Console.WriteLine("Committing changes, please wait...");
-            
+            importer = new Committer(importerConfig, importerLogger);
             Console.WriteLine("Changes committed.");
             break;
         default:
