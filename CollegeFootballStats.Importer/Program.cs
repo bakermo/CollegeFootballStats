@@ -43,14 +43,134 @@ var serviceProvider = new ServiceCollection()
 var importerLogger = serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Program>>();
 
 var importerConfig = new ImporterConfig(connectionString, apiUrl, apiKey);
-BaseImporter importer = null;
 
-// TODO: thinking we can have some args passed in or a switch statement based on input to pick a thing to import
-importer = new TeamsImporter(importerConfig, importerLogger);
+int actionChoice = GetAction();
 
-await importer.ImportAsync();
+while (actionChoice != (int)ImporterAction.Exit)
+{
+    BaseImporter importer = null;
+    switch ((ImporterAction)actionChoice)
+    {
+        case ImporterAction.RunImport:
+            int importChoice = GetImportAction();
+            switch ((ImportType)importChoice)
+            {
+                case ImportType.Coaches:
+                    //importer = new CoachesImporter(importerConfig, importerLogger);
+                    break;
+                case ImportType.Conferences:
+                    //importer = new ConferencesImporter(importerConfig, importerLogger);
+                    break;
+                case ImportType.DraftPicks:
+                    //importer = new DraftPicksImporter(importerConfig, importerLogger);
+                    break;
+                case ImportType.Games:
+                    //importer = new GamesImporter(importerConfig, importerLogger);
+                    break;
+                case ImportType.Players:
+                    //importer = new PlayersImporter(importerConfig, importerLogger);
+                    break;
+                case ImportType.PlayerGameStats:
+                    //importer = new PlayerGameStatsImporter(importerConfig, importerLogger);
+                    break;
+                case ImportType.Polls:
+                   // importer = new PollsImporter(importerConfig, importerLogger);
+                    break;
+                case ImportType.Rosters:
+                    //importer = new RostersImporter(importerConfig, importerLogger);
+                    break;
+                case ImportType.Teams:
+                    importer = new TeamsImporter(importerConfig, importerLogger);
+                    break;
+                case ImportType.TeamGameStats:
+                    //importer = new TeamGameStatsImporter(importerConfig, importerLogger);
+                    break;
+                default:
+                    Console.WriteLine("Invalid import type.");
+                    break;
+            }
+            if (importer != null)
+            {
+                await importer.ImportAsync();
+                Console.WriteLine("Import complete. DON'T FORGET TO COMMIT YOUR CHANGES!");
+            }
+            break;
+        case ImporterAction.CommitChanges:
+            Console.WriteLine("Committing changes, please wait...");
+            //await importer.CommitChangesAsync();
+            Console.WriteLine("Changes committed.");
+            break;
+        default:
+            break;
+    }
 
-// TODO: Add a config/arg to do commit or rollback automatically
-Console.WriteLine("Import complete. DON'T FORGET TO COMMIT YOUR CHANGES MANUALLY!");
-Console.WriteLine("Press any key to exit...");
-Console.ReadLine();
+    actionChoice = GetAction();
+}
+
+
+int GetImportAction()
+{
+    bool validImportAction = false;
+    int importActionChoice = 0;
+    while (!validImportAction)
+    {
+        Console.WriteLine("\nChoose an import type: ");
+        Enum.GetValues<ImportType>().ToList().ForEach(importType =>
+        {
+            Console.WriteLine($"{(int)importType}: {importType}");
+        });
+
+        validImportAction = int.TryParse(Console.ReadLine(), out importActionChoice);
+        // if the action is not in the enum, set validAction to false   
+        if (!Enum.IsDefined(typeof(ImportType), importActionChoice))
+        {
+            validImportAction = false;
+            Console.WriteLine("Invalid import type.");
+        }
+    }
+    return importActionChoice;
+}
+
+int GetAction()
+{
+    bool validAction = false;
+    int actionChoice = 0;
+    while (!validAction)
+    {
+        Console.WriteLine("\nChoose an action: ");
+        Enum.GetValues<ImporterAction>().ToList().ForEach(action =>
+        {
+            Console.WriteLine($"{(int)action}: {action}");
+        });
+
+        validAction = int.TryParse(Console.ReadLine(), out actionChoice);
+        // if the action is not in the enum, set validAction to false   
+        if (!Enum.IsDefined(typeof(ImporterAction), actionChoice))
+        {
+            validAction = false;
+            Console.WriteLine("Invalid action.");
+        }
+    }
+    return actionChoice;
+}
+
+public enum ImporterAction
+{
+    Exit = 0,
+    RunImport = 1,
+    CommitChanges = 2
+}
+
+public enum ImportType
+{
+    Coaches,
+    Conferences,
+    DraftPicks,
+    Games,
+    Players,
+    PlayerGameStats,
+    Polls,
+    Rosters,
+    Teams,
+    TeamGameStats,
+}
