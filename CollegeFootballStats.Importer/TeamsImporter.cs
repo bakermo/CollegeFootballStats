@@ -1,10 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using CollegeFootballStats.Core.Queries;
+using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace CollegeFootballStats.Importer
 {
@@ -32,11 +29,10 @@ namespace CollegeFootballStats.Importer
 
                 foreach (var team in response)
                 {
-                    _logger.LogInformation(team.Id + " " + team.School + " " + team.Abbreviation + " ");
-                    //var query = new Query("INSERT INTO teams (id, school, mascot, abbreviation, conference, division, color, alt_color, logo) VALUES (:Id, :School, :Mascot, :Abbreviation, :Conference, :Division, :Color, :AltColor, :Logo)", team);
-                    //await _queryManager.ExecuteAsync(query);
+                    var command = new InsertTeam(team.Id, team.School, team.Abbreviation);
+                    await _sqlCommandManager.ExecuteAsync(command);
+                    _logger.LogInformation("INSERTED TEAM:" + team.Id + " " + team.School + " " + team.Abbreviation);
                 }
-                _logger.LogInformation("Teams fetched. Importing...");
             }
             catch (Exception ex)
             {

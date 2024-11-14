@@ -1,6 +1,6 @@
 ﻿namespace CollegeFootballStats.Core.Queries
 {
-    public class GetTeams : QueryBase
+    public class GetTeams : SqlCommandBase
     {
         public override string Text => @"
             SELECT

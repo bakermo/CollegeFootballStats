@@ -45,10 +45,12 @@ var importerLogger = serviceProvider.GetRequiredService<Microsoft.Extensions.Log
 var importerConfig = new ImporterConfig(connectionString, apiUrl, apiKey);
 BaseImporter importer = null;
 
-// thinking we can have some args passed in or a switch statement based on input to pick a thing to import
+// TODO: thinking we can have some args passed in or a switch statement based on input to pick a thing to import
 importer = new TeamsImporter(importerConfig, importerLogger);
-
 
 await importer.ImportAsync();
 
+// TODO: Add a config/arg to do commit or rollback automatically
+Console.WriteLine("Import complete. DON'T FORGET TO COMMIT YOUR CHANGES MANUALLY!");
+Console.WriteLine("Press any key to exit...");
 Console.ReadLine();

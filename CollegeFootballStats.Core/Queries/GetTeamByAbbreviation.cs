@@ -1,6 +1,6 @@
 ﻿namespace CollegeFootballStats.Core.Queries
 {
-    public class GetTeamByAbbreviation : QueryBase
+    public class GetTeamByAbbreviation : SqlCommandBase
     {
         public GetTeamByAbbreviation(string abbreviation)
         {

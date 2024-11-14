@@ -1,7 +1,7 @@
 ﻿CREATE TABLE Team(
 	TeamID INT NOT NULL,
 	School VARCHAR2(50) NOT NULL,
-	Abbreviation VARCHAR2(50),
+	Abbreviation VARCHAR2(20),
 	PRIMARY KEY(TeamID)
 );
 CREATE TABLE Player(

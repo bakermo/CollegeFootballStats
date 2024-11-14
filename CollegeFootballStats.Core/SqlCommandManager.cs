@@ -3,25 +3,34 @@ using Oracle.ManagedDataAccess.Client;
 
 namespace CollegeFootballStats.Core
 {
-    public class QueryManager
+    public class SqlCommandManager
     {
         private readonly string _connectionString;
 
-        public QueryManager(string connectionString)
+        public SqlCommandManager(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        public async Task<IEnumerable<T>> QueryAsync<T>(IQuery query)
+        public async Task<IEnumerable<T>> QueryAsync<T>(ISqlCommand query)
         {
             using var conn = new OracleConnection(_connectionString);
             return await conn.QueryAsync<T>(query.Text, query.Parameters);
         }
 
-        public async Task<T> QueryFirstOrDefault<T>(IQuery query)
+        public async Task<T> QueryFirstOrDefault<T>(ISqlCommand query)
         {
             using var conn = new OracleConnection(_connectionString);
             return await conn.QueryFirstOrDefaultAsync<T>(query.Text, query.Parameters);
         }   
+
+        public Task ExecuteAsync(ISqlCommand query)
+        {
+            using var conn = new OracleConnection(_connectionString);
+            //await conn.ExecuteAsync(query.Text, query.Parameters);
+            conn.Execute(query.Text, query.Parameters);
+
+            return Task.CompletedTask;
+        }
     }
 }
