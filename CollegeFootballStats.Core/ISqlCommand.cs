@@ -1,6 +1,6 @@
-﻿namespace CollegeFootballStats.Server
+﻿namespace CollegeFootballStats.Core
 {
-    public interface IQuery
+    public interface ISqlCommand
     {
         string Text { get; }
         object? Parameters => null;

@@ -1,6 +1,6 @@
-﻿namespace CollegeFootballStats.Server
+﻿namespace CollegeFootballStats.Core
 {
-    public abstract class QueryBase : IQuery
+    public abstract class SqlCommandBase : ISqlCommand
     {
         public abstract string Text { get; }
 

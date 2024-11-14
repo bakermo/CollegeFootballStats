@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CollegeFootballStats.Server", "CollegeFootballStats.Server\CollegeFootballStats.Server.csproj", "{777DC747-EB76-481A-8EB1-31C3329250CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CollegeFootballStats.Server", "CollegeFootballStats.Server\CollegeFootballStats.Server.csproj", "{777DC747-EB76-481A-8EB1-31C3329250CA}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "collegefootballstats.client", "collegefootballstats.client\collegefootballstats.client.esproj", "{FD70E132-7542-43E5-A7A1-079E82388FFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CollegeFootballStats.Core", "CollegeFootballStats.Core\CollegeFootballStats.Core.csproj", "{FAD08567-0A7E-4EC3-A894-1BDCBC43F3D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CollegeFootballStats.Importer", "CollegeFootballStats.Importer\CollegeFootballStats.Importer.csproj", "{605B40B4-29C0-4934-B075-3A358930E071}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +27,14 @@ Global
 		{FD70E132-7542-43E5-A7A1-079E82388FFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD70E132-7542-43E5-A7A1-079E82388FFE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FD70E132-7542-43E5-A7A1-079E82388FFE}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{FAD08567-0A7E-4EC3-A894-1BDCBC43F3D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAD08567-0A7E-4EC3-A894-1BDCBC43F3D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAD08567-0A7E-4EC3-A894-1BDCBC43F3D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAD08567-0A7E-4EC3-A894-1BDCBC43F3D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{605B40B4-29C0-4934-B075-3A358930E071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{605B40B4-29C0-4934-B075-3A358930E071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{605B40B4-29C0-4934-B075-3A358930E071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{605B40B4-29C0-4934-B075-3A358930E071}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

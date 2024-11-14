@@ -1,6 +1,6 @@
-using CollegeFootballStats.Server.Queries;
-using CollegeFootballStats.Server.Models;
-using CollegeFootballStats.Server;
+using CollegeFootballStats.Core.Queries;
+using CollegeFootballStats.Core.Models;
+using CollegeFootballStats.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +12,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton(sp =>
 {
     var connectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("UFOracle");
-    return new QueryManager(connectionString);
+    return new SqlCommandManager(connectionString);
 });
 
 
@@ -36,19 +36,19 @@ var summaries = new[]
 };
 
 // query endpoints go here
-app.MapGet("/teams", async (QueryManager queryManager) =>
+app.MapGet("/teams", async (SqlCommandManager queryManager) =>
 {
-    IQuery query = new GetTeams();
+    ISqlCommand query = new GetTeams();
     var teams = await queryManager
         .QueryAsync<Team>(query);
     
     return Results.Ok(teams.ToList());
 });
 
-app.MapGet("/team/{abbreviation}", async(QueryManager queryManager, string abbreviation) =>
+app.MapGet("/team/{abbreviation}", async(SqlCommandManager queryManager, string abbreviation) =>
 {
     // this is some contrived example of passing in a parameter to a query
-    IQuery query = new GetTeamByAbbreviation(abbreviation);
+    ISqlCommand query = new GetTeamByAbbreviation(abbreviation);
     var team = await queryManager
         .QueryFirstOrDefault<Team>(query);
 
