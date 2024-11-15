@@ -56,7 +56,7 @@ while (actionChoice != (int)ImporterAction.Exit)
             switch ((ImportType)importChoice)
             {
                 case ImportType.Coaches:
-                    //importer = new CoachesImporter(importerConfig, importerLogger);
+                    importer = new CoachesImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.Conferences:
                     //importer = new ConferencesImporter(importerConfig, importerLogger);
@@ -99,6 +99,7 @@ while (actionChoice != (int)ImporterAction.Exit)
         case ImporterAction.CommitChanges:
             Console.WriteLine("Committing changes, please wait...");
             importer = new Committer(importerConfig, importerLogger);
+            await importer.ImportAsync();
             Console.WriteLine("Changes committed.");
             break;
         default:

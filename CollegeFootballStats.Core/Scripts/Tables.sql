@@ -16,7 +16,7 @@ CREATE TABLE Player(
 	PRIMARY KEY(PlayerID)
 );
 CREATE TABLE Coach(
-	CoachID INT NOT NULL,
+	CoachID INT GENERATED ALWAYS AS IDENTITY,
 	FirstName VARCHAR2(50),
 	LastName VARCHAR2(50),
 	PRIMARY KEY(CoachID)
@@ -73,6 +73,7 @@ CREATE TABLE CoachingRecord(
 	CoachID INT NOT NULL,
 	TeamID INT NOT NULL,
 	Year INT NOT NULL,	
+	Games INT,
 	Wins INT,
 	Losses INT,
 	Ties INT,
