@@ -14,4 +14,30 @@ namespace CollegeFootballStats.Importer
         // yes...abbreviation is nullable in the api...guessing we wont use those teams much
         public string? Abbreviation { get; set; }
     }
+
+    internal class CoachResponse
+    {
+        // Gotta have the dumb underscores because that
+        // is what the api returns
+        public string First_Name { get; set; }
+        public string Last_Name { get; set; }
+        public List<CoachSeason> Seasons { get; set; }
+        public CoachResponse()
+        {
+            Seasons = new List<CoachSeason>();
+        }
+
+    }
+
+    internal class CoachSeason
+    {
+        // The give us the school name in the api, but we need the id
+        // so we will have to look it up
+        public string School { get; set; }
+        public int Year { get; set; }
+        public int Games { get; set; }
+        public int Wins { get; set; }
+        public int Losses { get; set; }
+        public int Ties { get; set; }
+    }
 }
