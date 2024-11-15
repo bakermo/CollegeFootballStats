@@ -1,27 +1,18 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home';
+import Home from './pages/Home.jsx';
+import GameChangers from './pages/GameChangers.jsx';
 
 const theme = createTheme({
     palette: {
         primary: {
-            main: '#683ab7',
+            main: '#212D40',
         },
-        background: {
-            default: '#f5f5f5',
-        },
-    },
-    typography: {
-        h1: {
-            fontSize: '2rem',
-            fontWeight: 600,
-        },
-        h2: {
-            fontSize: '1.5rem',
-            fontWeight: 500,
+        secondary: {
+            main: '#3F4C64',
         }
-    },
+    }
 });
 
 function App() {
@@ -31,6 +22,7 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/player-impact" element={<GameChangers />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </BrowserRouter>

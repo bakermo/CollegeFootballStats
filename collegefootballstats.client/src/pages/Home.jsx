@@ -1,7 +1,6 @@
-import { Box, Container, Typography, AppBar, Toolbar, Menu, MenuItem, IconButton } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
-import { useState } from 'react';
+import { Box, Container, Typography, Button, Card } from '@mui/material';
 import AnalysisCard from '../components/AnalysisCard.jsx';
+import Header from '../components/Header.jsx';
 
 const analysisCards = [
     {
@@ -32,16 +31,6 @@ const analysisCards = [
 ];
 
 function Home() {
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    const handleMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
     return (
         <Box sx={{
             minHeight: '100vh',
@@ -49,32 +38,7 @@ function Home() {
             display: 'flex',
             flexDirection: 'column'
         }}>
-            <AppBar position="static" sx={{ backgroundColor: '#683ab7' }}>
-                <Container maxWidth="lg">
-                    <Toolbar sx={{ padding: '0 !important' }}>
-                        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            College Football Stat Hub
-                        </Typography>
-                        <IconButton
-                            size="large"
-                            edge="end"
-                            color="inherit"
-                            aria-label="menu"
-                            onClick={handleMenuOpen}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Menu
-                            anchorEl={anchorEl}
-                            open={Boolean(anchorEl)}
-                            onClose={handleMenuClose}
-                        >
-                            <MenuItem onClick={handleMenuClose}>About Us</MenuItem>
-                            <MenuItem onClick={handleMenuClose}>Database Tables</MenuItem>
-                        </Menu>
-                    </Toolbar>
-                </Container>
-            </AppBar>
+            <Header />
 
             <Container
                 maxWidth="lg"
@@ -89,25 +53,22 @@ function Home() {
                 <Typography
                     variant="h1"
                     component="h1"
+                    align="center"
                     gutterBottom
                     sx={{
                         fontSize: '2rem',
                         fontWeight: 500,
-                        mb: 4
+                        mb: 6,
+                        color: '#212D40'
                     }}
                 >
                     Your GO-TO hub for College Football Stat analysis and visualization
                 </Typography>
 
                 <Box sx={{
-                    display: 'grid',
-                    gap: 3,
-                    gridTemplateColumns: {
-                        xs: '1fr',
-                        sm: 'repeat(2, 1fr)',
-                        md: 'repeat(3, 1fr)'
-                    },
-                    flex: 1
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4
                 }}>
                     {analysisCards.map((card, index) => (
                         <AnalysisCard
@@ -117,6 +78,45 @@ function Home() {
                             path={card.path}
                         />
                     ))}
+
+                    <Card sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        p: 3,
+                        gap: 2,
+                        backgroundColor: '#fff'
+                    }}>
+                        <Typography variant="h6">
+                            Shows all of the tuples found within the our database
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                            <Button
+                                variant="contained"
+                                sx={{
+                                    backgroundColor: '#3F4C64',
+                                    '&:hover': {
+                                        backgroundColor: '#212D40'
+                                    }
+                                }}
+                            >
+                                Show Total Tuples
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                sx={{
+                                    color: '#3F4C64',
+                                    borderColor: '#3F4C64',
+                                    '&:hover': {
+                                        borderColor: '#212D40',
+                                        color: '#212D40'
+                                    }
+                                }}
+                            >
+                                Tuples here
+                            </Button>
+                        </Box>
+                    </Card>
                 </Box>
             </Container>
         </Box>
