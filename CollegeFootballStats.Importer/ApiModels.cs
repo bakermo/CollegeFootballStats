@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CollegeFootballStats.Importer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -78,4 +79,32 @@ namespace CollegeFootballStats.Importer
         public int? Weight { get; set; }
         public int? Year { get; set; }
     }
+}
+
+internal class PollResponse
+{
+    public int Season { get; set; }
+    public string SeasonType { get; set; }
+    public int Week { get; set; }
+    public List<ActualPolls> Polls { get; set; }
+    public PollResponse()
+    {
+        Polls = new List<ActualPolls>();
+    }
+}
+
+internal class ActualPolls
+{
+    public string Poll { get; set; }
+    public List<PollRankings> Ranks { get; set; }
+    public ActualPolls()
+    {
+        Ranks = new List<PollRankings>();
+    }
+}
+
+internal class PollRankings
+{
+    public int Rank { get; set; }
+    public string School { get; set; }
 }
