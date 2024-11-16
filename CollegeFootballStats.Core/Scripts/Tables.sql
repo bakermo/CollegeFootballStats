@@ -98,8 +98,8 @@ CREATE TABLE ConferenceMembership(
 	FOREIGN KEY(TeamID) REFERENCES Team(TeamID)
 );
 CREATE TABLE TeamGameStat(
-	StatID INT NOT NULL,
-	StatValue INT,
+	StatID INT GENERATED ALWAYS AS IDENTITY,
+	StatValue NUMBER,
 	StatCategory VARCHAR2(50),
 	Game INT NOT NULL,
 	Team INT NOT NULL,
@@ -108,8 +108,8 @@ CREATE TABLE TeamGameStat(
 	FOREIGN KEY (Team) REFERENCES Team(TeamID)
 );	
 CREATE TABLE PlayerGameStat(
-	StatID INT NOT NULL,
-	StatValue INT,
+	StatID INT GENERATED ALWAYS AS IDENTITY,
+	StatValue NUMBER,
 	StatType VARCHAR2(20),
 	StatCategory VARCHAR2(20),
 	Game INT NOT NULL,

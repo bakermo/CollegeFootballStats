@@ -10,7 +10,7 @@ namespace CollegeFootballStats.Importer
     internal class TeamResponse
     {
         public int Id { get; set; }
-        public string School { get; set; }
+        public string School { get; set; } = string.Empty;
 
         // yes...abbreviation is nullable in the api...guessing we wont use those teams much
         public string? Abbreviation { get; set; }
@@ -34,7 +34,7 @@ namespace CollegeFootballStats.Importer
     {
         // The give us the school name in the api, but we need the id
         // so we will have to look it up
-        public string School { get; set; }
+        public string School { get; set; } = string.Empty;
         public int Year { get; set; }
         public int Games { get; set; }
         public int Wins { get; set; }
@@ -49,13 +49,13 @@ namespace CollegeFootballStats.Importer
         public int Week { get; set; }
         public DateTime Start_Date { get; set; }
         public int Home_Id { get; set; }
-        public string Home_Team { get; set; }
+        public string Home_Team { get; set; } = string.Empty;
         public int? Home_Points { get; set; }
         public int Away_Id { get; set; }
-        public string Away_Team { get; set; }
+        public string Away_Team { get; set; } = string.Empty;
         public int? Away_Points { get; set; }
         public bool Completed { get; set; }
-        public string Season_Type { get; set; }
+        public string Season_Type { get; set; } = string.Empty;
     }
 
     internal class ConferenceResponse
@@ -70,10 +70,10 @@ namespace CollegeFootballStats.Importer
     internal class RosterResponse
     {
         public int Id { get; set; }
-        public string First_Name { get; set; }
-        public string Last_Name { get; set; }
-        public string Team { get; set; }
-        public string Position { get; set; }
+        public string First_Name { get; set; } = string.Empty;
+        public string Last_Name { get; set; } = string.Empty;
+        public string Team { get; set; } = string.Empty;
+        public string Position { get; set; } = string.Empty;
         public int? Jersey { get; set; }
         public int? Height { get; set; }
         public int? Weight { get; set; }
@@ -104,21 +104,54 @@ namespace CollegeFootballStats.Importer
     internal class PollRankings
     {
         public int Rank { get; set; }
-        public string School { get; set; }
+        public string School { get; set; } = string.Empty;
     }
 
     internal class DraftPickResponse
     {
         // Yes.. in the api this can be null...so we will skip it
         public int? CollegeAthleteId { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public int Year { get; set; }
         public int Round { get; set; }
         public int CollegeId { get; set; }
-        public string CollegeTeam { get; set; }
-        public string NFLTeam { get; set; }
-        public string Position { get; set; }
+        public string CollegeTeam { get; set; } = string.Empty;
+        public string NFLTeam { get; set; } = string.Empty;
+        public string Position { get; set; } = string.Empty;
         public int Pick { get; set; }
         public int Overall { get; set; }
+    }
+
+    internal class TeamGameStatResponse
+    {
+        /// <summary>
+        /// The game Id
+        /// </summary>
+        public int Id { get; set; }
+        public List<TeamGameStatTeam> Teams { get; set; }
+        public TeamGameStatResponse()
+        {
+            Teams = new List<TeamGameStatTeam>();
+        }
+    }
+
+    internal class TeamGameStatTeam
+    {
+        /// <summary>
+        /// The team Id
+        /// </summary>
+        public int SchoolId { get; set; }
+        public string School { get; set; }
+        public List<TeamGameStat> Stats { get; set; }
+        public TeamGameStatTeam()
+        {
+            Stats = new List<TeamGameStat>();
+        }
+    }
+
+    internal class TeamGameStat
+    {
+        public string Category { get; set; } = string.Empty;
+        public string Stat { get; set; } = string.Empty;
     }
 }

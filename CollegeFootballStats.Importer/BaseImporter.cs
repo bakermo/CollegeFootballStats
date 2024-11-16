@@ -22,9 +22,23 @@ namespace CollegeFootballStats.Importer
 
             So we will start with 2004
         */
-
+        protected const int MIN_SEASON_WEEK = 1;
+        protected const int MAX_SEASON_WEEK = 20;
         protected const int DEFAULT_MIN_SEASON = 2004;
         protected const int DEFAULT_MAX_SEASON = 2024;
+        protected const string TEAMS_TABLE = "TEAM";
+        protected const string PLAYERS_TABLE = "PLAYER";
+        protected const string COACHES_TABLE = "COACH";
+        protected const string COACHING_RECORDS_TABLE = "COACHINGRECORD";
+        protected const string CONFERENCE_MEMBERSHIP_TABLE = "CONFERENCEMEMBERSHIP";
+        protected const string CONFERENCE_TABLE = "CONFERENCE";
+        protected const string GAMES_TABLE = "GAME";
+        protected const string DRAFT_PICKS_TABLE = "DRAFTPICK";
+        protected const string ROSTERS_TABLE = "ROSTER";
+        protected const string POLLS_TABLE = "POLL";
+        protected const string TEAM_GAME_STATS_TABLE = "TEAMGAMESTAT";
+        protected const string PLAYER_GAME_STATS_TABLE = "PLAYERGAMESTAT";
+
 
         public BaseImporter(ImporterConfig config, ILogger logger)
         {
@@ -53,6 +67,12 @@ namespace CollegeFootballStats.Importer
               .ToDictionary(g => g.Key, g => g.OrderBy(t => t.TeamId).First().TeamId);
 
             return teams;
+        }
+
+        protected async Task<bool> TableHasRecords(string tableName)
+        {
+            var result = await _sqlCommandManager.QueryFirstOrDefault<int>(new CountTuplesByTable(tableName));
+            return result > 0;
         }
     }
 }

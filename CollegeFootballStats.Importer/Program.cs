@@ -3,7 +3,6 @@ using CollegeFootballStats.Importer;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 // Set up configuration sources.
@@ -23,9 +22,17 @@ Console.WriteLine($"Connection String: {connectionString}");
 Console.WriteLine($"API Url: {apiUrl}");
 Console.WriteLine($"API Key: {apiKey}");
 
+int workerThreads, completionPortThreads;
+ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
+
+Console.WriteLine($"Available Worker Threads: {workerThreads}");
+Console.WriteLine($"Available Completion Port Threads: {completionPortThreads}");
+
+Console.WriteLine($"Processor count: {Environment.ProcessorCount}");
+
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Verbose()
+    .MinimumLevel.Information()
     .WriteTo.Console()
     .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
@@ -85,7 +92,7 @@ while (actionChoice != (int)ImporterAction.Exit)
                     importer = new TeamsImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.TeamGameStats:
-                    //importer = new TeamGameStatsImporter(importerConfig, importerLogger);
+                    importer = new TeamGameStatsImporter(importerConfig, importerLogger);
                     break;
                 default:
                     Console.WriteLine("Invalid import type.");
