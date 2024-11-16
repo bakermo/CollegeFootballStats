@@ -41,3 +41,12 @@ namespace CollegeFootballStats.Importer
         public int Ties { get; set; }
     }
 }
+
+internal class ConferenceResponse
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? Short_Name { get; set; }
+    public string? Classification { get; set; }
+    public string? Abbreviation { get; set; }
+}

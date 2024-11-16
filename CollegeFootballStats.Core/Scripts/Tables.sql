@@ -23,10 +23,10 @@ CREATE TABLE Coach(
 );
 CREATE TABLE Conference(
 	ConferenceID INT NOT NULL,
-	Name VARCHAR2(50),
 	ShortName VARCHAR2(50),
-	Classification VARCHAR2(20),
+	Name VARCHAR2(100),
 	Division VARCHAR2(20),
+	Abbreviation VARCHAR2(20),
 	PRIMARY KEY(ConferenceID)
 );
 CREATE TABLE Game(
