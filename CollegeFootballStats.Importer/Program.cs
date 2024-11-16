@@ -79,7 +79,7 @@ while (actionChoice != (int)ImporterAction.Exit)
                     //importer = new PlayerGameStatsImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.Polls:
-                   // importer = new PollsImporter(importerConfig, importerLogger);
+                    importer = new PollsImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.Rosters:
                     //importer = new RostersImporter(importerConfig, importerLogger);
