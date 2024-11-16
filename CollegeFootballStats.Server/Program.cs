@@ -1,6 +1,7 @@
 using CollegeFootballStats.Core.Queries;
 using CollegeFootballStats.Core.Models;
 using CollegeFootballStats.Core;
+using Dapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+SqlMapper.RemoveTypeMap(typeof(bool));
+SqlMapper.AddTypeHandler(typeof(bool), new BoolToNumberHandler());
 
 var summaries = new[]
 {

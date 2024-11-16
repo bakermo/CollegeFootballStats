@@ -1,4 +1,6 @@
-﻿using CollegeFootballStats.Importer;
+﻿using CollegeFootballStats.Core;
+using CollegeFootballStats.Importer;
+using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -37,6 +39,9 @@ var serviceProvider = new ServiceCollection()
     .AddSingleton(configuration)
     .BuildServiceProvider();
 
+SqlMapper.RemoveTypeMap(typeof(bool));
+SqlMapper.AddTypeHandler(typeof(bool), new BoolToNumberHandler());
+
 // Get the logger from the service provider
 
 // Instantiate the importer and pass the logger
@@ -65,7 +70,7 @@ while (actionChoice != (int)ImporterAction.Exit)
                     //importer = new DraftPicksImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.Games:
-                    //importer = new GamesImporter(importerConfig, importerLogger);
+                    importer = new GamesImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.Players:
                     //importer = new PlayersImporter(importerConfig, importerLogger);
@@ -139,7 +144,7 @@ int GetAction()
     int actionChoice = 0;
     while (!validAction)
     {
-        Console.WriteLine("\nChoose an action: (Enter the number");
+        Console.WriteLine("\nChoose an action (Enter the number):");
         Enum.GetValues<ImporterAction>().ToList().ForEach(action =>
         {
             Console.WriteLine($"{(int)action}: {action}");

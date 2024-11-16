@@ -38,9 +38,11 @@ CREATE TABLE Game(
 	HomePoints INT,
 	AwayTeam INT NOT NULL,
 	AwayPoints INT,
+	IsCompleted NUMBER(1),
+	IsPostseason NUMBER(1),
 	PRIMARY KEY(GameID),
-   	 FOREIGN KEY(HomeTeam) REFERENCES Team(TeamID),
-    	FOREIGN KEY(AwayTeam) REFERENCES Team(TeamID)
+   	FOREIGN KEY(HomeTeam) REFERENCES Team(TeamID),
+    FOREIGN KEY(AwayTeam) REFERENCES Team(TeamID)
 );
 CREATE TABLE DraftPick(
 	DraftPickID INT NOT NULL,

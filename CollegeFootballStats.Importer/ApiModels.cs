@@ -40,4 +40,20 @@ namespace CollegeFootballStats.Importer
         public int Losses { get; set; }
         public int Ties { get; set; }
     }
+
+    internal class GameResponse
+    {
+        public int Id { get; set; }
+        public int Season { get; set; }
+        public int Week { get; set; }
+        public DateTime Start_Date { get; set; }
+        public int Home_Id { get; set; }
+        public string Home_Team { get; set; }
+        public int? Home_Points { get; set; }
+        public int Away_Id { get; set; }
+        public string Away_Team { get; set; }
+        public int? Away_Points { get; set; }
+        public bool Completed { get; set; }
+        public string Season_Type { get; set; }
+    }
 }
