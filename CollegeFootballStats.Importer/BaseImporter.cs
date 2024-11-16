@@ -10,7 +10,20 @@ namespace CollegeFootballStats.Importer
         protected readonly HttpClient _httpClient;
         protected readonly SqlCommandManager _sqlCommandManager;
         protected readonly ILogger _logger;
-        protected const int DEFAULT_MIN_SEASON = 2000;
+        /* 
+            Per the API docs:
+
+                Game schedules and scores go back 1869
+                Drive, play, stats, and box score data generally go back to 2001
+                Historical rosters go back to around 2004
+                Polling data goes back to 1936
+                Recruiting data goes back to 2000
+                NFL Draft data starts in 1967
+
+            So we will start with 2004
+        */
+
+        protected const int DEFAULT_MIN_SEASON = 2004;
         protected const int DEFAULT_MAX_SEASON = 2024;
 
         public BaseImporter(ImporterConfig config, ILogger logger)
