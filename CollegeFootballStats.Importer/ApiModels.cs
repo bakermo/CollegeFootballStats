@@ -79,32 +79,46 @@ namespace CollegeFootballStats.Importer
         public int? Weight { get; set; }
         public int? Year { get; set; }
     }
-}
-
-internal class PollResponse
-{
-    public int Season { get; set; }
-    public string SeasonType { get; set; }
-    public int Week { get; set; }
-    public List<ActualPolls> Polls { get; set; }
-    public PollResponse()
+    internal class PollResponse
     {
-        Polls = new List<ActualPolls>();
+        public int Season { get; set; }
+        public string SeasonType { get; set; }
+        public int Week { get; set; }
+        public List<ActualPolls> Polls { get; set; }
+        public PollResponse()
+        {
+            Polls = new List<ActualPolls>();
+        }
     }
-}
 
-internal class ActualPolls
-{
-    public string Poll { get; set; }
-    public List<PollRankings> Ranks { get; set; }
-    public ActualPolls()
+    internal class ActualPolls
     {
-        Ranks = new List<PollRankings>();
+        public string Poll { get; set; }
+        public List<PollRankings> Ranks { get; set; }
+        public ActualPolls()
+        {
+            Ranks = new List<PollRankings>();
+        }
     }
-}
 
-internal class PollRankings
-{
-    public int Rank { get; set; }
-    public string School { get; set; }
+    internal class PollRankings
+    {
+        public int Rank { get; set; }
+        public string School { get; set; }
+    }
+
+    internal class DraftPickResponse
+    {
+        // Yes.. in the api this can be null...so we will skip it
+        public int? CollegeAthleteId { get; set; }
+        public string Name { get; set; }
+        public int Year { get; set; }
+        public int Round { get; set; }
+        public int CollegeId { get; set; }
+        public string CollegeTeam { get; set; }
+        public string NFLTeam { get; set; }
+        public string Position { get; set; }
+        public int Pick { get; set; }
+        public int Overall { get; set; }
+    }
 }

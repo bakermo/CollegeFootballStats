@@ -45,14 +45,17 @@ CREATE TABLE Game(
     FOREIGN KEY(AwayTeam) REFERENCES Team(TeamID)
 );
 CREATE TABLE DraftPick(
-	DraftPickID INT NOT NULL,
-	Year INT,
-	Round INT,
+	DraftPickID INT GENERATED ALWAYS AS IDENTITY,
+	PlayerID INT NOT NULL,
 	CollegeTeam INT NOT NULL,
 	NFLTeam VARCHAR2(50),
 	Position VARCHAR2(20),
+	Year INT,
+	Round INT,
+	RoundPick INT,
 	OverallPick INT,
 	PRIMARY KEY(DraftPickID),
+	FOREIGN KEY(PlayerID) REFERENCES Player(PlayerID),
 	FOREIGN KEY(CollegeTeam) REFERENCES Team(TeamID)
 );
 CREATE TABLE Roster(

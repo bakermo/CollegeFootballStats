@@ -43,7 +43,7 @@ namespace CollegeFootballStats.Importer
             // The API is going to give us the school name, but we need the team id
             // We also need the team id to respect the FK constraint on the coaching record table
             // So as long as we have the teams in the database, we can look them up
-            var teams = (await _sqlCommandManager.QueryAsync<Team>(new GetTeams()))
+            var teams = (await _sqlCommandManager.QueryAsync<Team>(new GetAllTeams()))
               .GroupBy(t => t.School)
               // ugh, we have to do this dumb grouping because there are a handful of schools/teams
               // that show up in the database multiple times. it seems to be the most reliable way of 

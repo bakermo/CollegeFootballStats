@@ -16,7 +16,7 @@ namespace CollegeFootballStats.Importer
             _logger.LogInformation("Fetching existing teams from database...");
 
             // We are going to get FK constraint errors if we try to insert games without teams
-            var teams = (await _sqlCommandManager.QueryAsync<Team>(new GetTeams())).ToList();
+            var teams = (await _sqlCommandManager.QueryAsync<Team>(new GetAllTeams())).ToList();
             if (teams.Count == 0)
             {
                 _logger.LogError("No teams found in database! Teams are required to import games. Please import teams first!");

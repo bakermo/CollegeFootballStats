@@ -42,7 +42,7 @@ var summaries = new[]
 // query endpoints go here
 app.MapGet("/teams", async (SqlCommandManager queryManager) =>
 {
-    ISqlCommand query = new GetTeams();
+    ISqlCommand query = new GetAllTeams();
     var teams = await queryManager
         .QueryAsync<Team>(query);
     
