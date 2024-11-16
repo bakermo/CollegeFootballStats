@@ -13,9 +13,7 @@ namespace CollegeFootballStats.Importer
 
         public override async Task ImportAsync()
         {
-            _logger.LogInformation("Fetching exiting teams from database...");
-            var teams = (await _sqlCommandManager.QueryAsync<Team>(new GetTeams()))
-              .GroupBy(t => t.School).ToDictionary(g => g.Key, g => g.OrderBy(t => t.TeamId).First().TeamId);
+            var teams = await GetUniqueTeamsFromDatabase(); 
 
             if (teams.Count == 0)
             {
@@ -29,7 +27,7 @@ namespace CollegeFootballStats.Importer
 
             try
             {
-                for (int i = 2000; i <= 2024; i++)
+                for (int i = DEFAULT_MIN_SEASON; i <= DEFAULT_MAX_SEASON; i++)
                 {
                     var response = await _httpClient.GetFromJsonAsync<List<PollResponse>>($"rankings?year={i}&seasonType=both");
                     _logger.LogInformation($"Fetched {response.Count} regular and postseason polls for {i} Season: ");
