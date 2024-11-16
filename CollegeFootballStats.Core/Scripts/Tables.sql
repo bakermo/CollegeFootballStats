@@ -56,10 +56,10 @@ CREATE TABLE DraftPick(
 	FOREIGN KEY(CollegeTeam) REFERENCES Team(TeamID)
 );
 CREATE TABLE Roster(
-	Year INT NOT NULL,
 	TeamID INT NOT NULL,
 	PlayerID INT NOT NULL,
-	PRIMARY KEY(PlayerID, TeamID, Year),
+	Season INT NOT NULL,
+	PRIMARY KEY(PlayerID, TeamID, Season),
 	FOREIGN KEY(PlayerID) REFERENCES Player(PlayerID),
 	FOREIGN KEY(TeamID) REFERENCES Team(TeamID)
 );

@@ -27,9 +27,9 @@ namespace CollegeFootballStats.Importer
 
             try
             {
-                for (int i = 2000; i <= 2024; i++) {
-                    var response = await _httpClient.GetFromJsonAsync<List<GameResponse>>($"games?year={i}&seasonType=both");
-                    _logger.LogInformation($"Fetched {response.Count} regular and postseason games for {i} Season: ");
+                for (int season = DEFAULT_MIN_SEASON; season <= DEFAULT_MAX_SEASON; season++) {
+                    var response = await _httpClient.GetFromJsonAsync<List<GameResponse>>($"games?year={season}&seasonType=both");
+                    _logger.LogInformation($"Fetched {response.Count} regular and postseason games for {season} Season: ");
                     foreach (var game in response)
                     {
                         var insertGameCommand = new InsertGame(game.Id, game.Start_Date, game.Season, game.Week, game.Home_Id,

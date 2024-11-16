@@ -56,13 +56,26 @@ namespace CollegeFootballStats.Importer
         public bool Completed { get; set; }
         public string Season_Type { get; set; }
     }
-}
 
-internal class ConferenceResponse
-{
-    public int Id { get; set; }
-    public string? Name { get; set; }
-    public string? Short_Name { get; set; }
-    public string? Classification { get; set; }
-    public string? Abbreviation { get; set; }
+    internal class ConferenceResponse
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Short_Name { get; set; }
+        public string? Classification { get; set; }
+        public string? Abbreviation { get; set; }
+    }
+
+    internal class RosterResponse
+    {
+        public int Id { get; set; }
+        public string First_Name { get; set; }
+        public string Last_Name { get; set; }
+        public string Team { get; set; }
+        public string Position { get; set; }
+        public int? Jersey { get; set; }
+        public int? Height { get; set; }
+        public int? Weight { get; set; }
+        public int? Year { get; set; }
+    }
 }

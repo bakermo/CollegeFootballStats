@@ -1,5 +1,4 @@
-﻿using CollegeFootballStats.Core.Models;
-using CollegeFootballStats.Core.Queries;
+﻿using CollegeFootballStats.Core.Queries;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 
@@ -13,18 +12,7 @@ namespace CollegeFootballStats.Importer
 
         public override async Task ImportAsync()
         {
-            _logger.LogInformation("Fetching exiting teams from database...");
-            // The API is going to give us the school name, but we need the team id
-            // We also need the team id to respect the FK constraint on the coaching record table
-            // So as long as we have the teams in the database, we can look them up
-            var teams = (await _sqlCommandManager.QueryAsync<Team>(new GetTeams()))
-              .GroupBy(t => t.School)
-              // ugh, we have to do this dumb grouping because there are a handful of schools/teams
-              // that show up in the database multiple times. it seems to be the most reliable way of 
-              // dealing with this is grab the earliest id, as its most likely to actually be populated.
-              // I may deal with this later with the team importer and remport teams. for now we have to
-              // do this dumbassery
-              .ToDictionary(g => g.Key, g => g.OrderBy(t => t.TeamId).First().TeamId);
+            var teams = await GetUniqueTeamsFromDatabase();
 
             if (teams.Count == 0)
             {
