@@ -64,7 +64,7 @@ while (actionChoice != (int)ImporterAction.Exit)
                     importer = new CoachesImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.Conferences:
-                    //importer = new ConferencesImporter(importerConfig, importerLogger);
+                    importer = new ConferencesImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.DraftPicks:
                     //importer = new DraftPicksImporter(importerConfig, importerLogger);
