@@ -72,7 +72,7 @@ while (actionChoice != (int)ImporterAction.Exit)
                 case ImportType.Games:
                     importer = new GamesImporter(importerConfig, importerLogger);
                     break;
-                case ImportType.Players:
+                case ImportType.PlayersAndRosters:
                     importer = new PlayersImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.PlayerGameStats:
@@ -80,9 +80,6 @@ while (actionChoice != (int)ImporterAction.Exit)
                     break;
                 case ImportType.Polls:
                     importer = new PollsImporter(importerConfig, importerLogger);
-                    break;
-                case ImportType.Rosters:
-                    //importer = new RostersImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.Teams:
                     importer = new TeamsImporter(importerConfig, importerLogger);
@@ -174,10 +171,9 @@ public enum ImportType
     Conferences,
     DraftPicks,
     Games,
-    Players,
+    PlayersAndRosters,
     PlayerGameStats,
     Polls,
-    Rosters,
     Teams,
     TeamGameStats,
 }
