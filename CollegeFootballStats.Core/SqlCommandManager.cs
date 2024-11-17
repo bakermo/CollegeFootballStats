@@ -79,5 +79,32 @@ namespace CollegeFootballStats.Core
 
             return Task.CompletedTask;
         }
+
+        public void BulkInsert(DataTable dataTable)
+        {
+            using var conn = new OracleConnection(_connectionString);
+            {
+                conn.Open();
+                using (OracleBulkCopy bulkCopy = new OracleBulkCopy(conn))
+                {
+                    bulkCopy.DestinationSchemaName = "\"MATTHEW.BAKER\"";
+                    bulkCopy.DestinationTableName = dataTable.TableName;// "PLAYERSEASONSTAT";
+                    bulkCopy.BatchSize = 1000;
+                    foreach (var column in dataTable.Columns)
+                    {
+                        bulkCopy.ColumnMappings.Add(column.ToString(), column.ToString());
+                    }
+                    try
+                    {
+                        bulkCopy.WriteToServer(dataTable);
+                        Console.WriteLine("Bulk insert completed successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error during bulk insert: {ex.Message} {ex.StackTrace} {ex.InnerException}");
+                    }
+                }
+            }
+        }
     }
 }

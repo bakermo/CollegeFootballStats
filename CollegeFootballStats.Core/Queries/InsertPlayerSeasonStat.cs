@@ -1,36 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CollegeFootballStats.Core.Queries
+﻿namespace CollegeFootballStats.Core.Queries
 {
-    public class InsertPlayerGameStat : SqlCommandBase
+    public class InsertPlayerSeasonStat : SqlCommandBase
     {
-        public InsertPlayerGameStat(int gameId, int playerId, decimal statValue, string statCategory, string statType)
+        public InsertPlayerSeasonStat(int playerId, int seasonId, decimal statValue, string statCategory, string statType)
         {
             Parameters = new
             {
                 StatId = 0,
-                Game = gameId,
                 Player = playerId,
+                Season = seasonId,
                 StatValue = statValue,
                 StatCategory = statCategory,
                 StatType = statType
             };
         }
         public override string Text => @"
-            INSERT INTO PlayerGameStat(
-                Game,
+            INSERT INTO PlayerSeasonStat(
                 Player,
+                Season,
                 StatValue,
                 StatCategory,
                 StatType
             )
             VALUES(
-                :Game,
                 :Player,
+                :Season,
                 :StatValue,
                 :StatCategory,
                 :StatType
