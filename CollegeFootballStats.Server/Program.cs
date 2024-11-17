@@ -2,6 +2,7 @@ using CollegeFootballStats.Core.Queries;
 using CollegeFootballStats.Core.Models;
 using CollegeFootballStats.Core;
 using Dapper;
+using CollegeFootballStats.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,27 @@ app.MapGet("/team/{abbreviation}", async(SqlCommandManager queryManager, string 
     }
 
     return Results.Ok(team);
+});
+
+app.MapGet("/tuples", async (SqlCommandManager queryManager) => {
+    // yes. This is inefficient. Yes. there is a better way to do this in one query
+    // but right now im tired and don't care
+    var response = new TupleCount();
+    response.Teams = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("TEAM"));
+    response.Coaches = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("COACH"));
+    response.CoachingRecords = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("COACHINGRECORD"));
+    response.Conferences = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("CONFERENCE"));
+    response.ConferenceMemberships = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("CONFERENCEMEMBERSHIP"));
+    response.DraftPicks = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("DRAFTPICK"));
+    response.Games = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("GAME"));
+    response.Rosters = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("ROSTER"));
+    response.Players = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("PLAYER"));
+    response.Polls = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("POLL"));
+    response.PlayerSeasonStats = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("PLAYERSEASONSTAT"));
+    response.TeamGameStats = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("TEAMGAMESTAT"));
+    response.TotalTuples = response.Teams + response.Coaches + response.CoachingRecords + response.Conferences + response.ConferenceMemberships + response.DraftPicks + response.Games + response.Rosters + response.Players + response.Polls + response.PlayerSeasonStats + response.TeamGameStats;
+
+    return Results.Ok(response);
 });
 
 app.MapFallbackToFile("/index.html");
