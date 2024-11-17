@@ -1,7 +1,8 @@
-﻿using CollegeFootballStats.Importer;
+﻿using CollegeFootballStats.Core;
+using CollegeFootballStats.Importer;
+using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 // Set up configuration sources.
@@ -13,17 +14,27 @@ var builder = new ConfigurationBuilder()
 IConfiguration configuration = builder.Build();
 
 var connectionString = configuration.GetConnectionString("UFOracle");
-var apiUrl = configuration["CollegeFootballDataApi:Url"];
+var apiV1Url = configuration["CollegeFootballDataApi:V1Url"];
+var apiV2Url = configuration["CollegeFootballDataApi:V2Url"];
 var apiKey = configuration["CollegeFootballDataApi:ApiKey"];
 
 
 Console.WriteLine($"Connection String: {connectionString}");
-Console.WriteLine($"API Url: {apiUrl}");
+Console.WriteLine($"API V1 Url: {apiV1Url}");
+Console.WriteLine($"API V2 Url: {apiV2Url}");
 Console.WriteLine($"API Key: {apiKey}");
+
+int workerThreads, completionPortThreads;
+ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
+
+Console.WriteLine($"Available Worker Threads: {workerThreads}");
+Console.WriteLine($"Available Completion Port Threads: {completionPortThreads}");
+
+Console.WriteLine($"Processor count: {Environment.ProcessorCount}");
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Verbose()
+    .MinimumLevel.Information()
     .WriteTo.Console()
     .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
@@ -37,12 +48,15 @@ var serviceProvider = new ServiceCollection()
     .AddSingleton(configuration)
     .BuildServiceProvider();
 
+SqlMapper.RemoveTypeMap(typeof(bool));
+SqlMapper.AddTypeHandler(typeof(bool), new BoolToNumberHandler());
+
 // Get the logger from the service provider
 
 // Instantiate the importer and pass the logger
 var importerLogger = serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Program>>();
 
-var importerConfig = new ImporterConfig(connectionString, apiUrl, apiKey);
+var importerConfig = new ImporterConfig(connectionString, apiV1Url, apiKey, apiV2Url);
 
 int actionChoice = GetAction();
 
@@ -59,31 +73,31 @@ while (actionChoice != (int)ImporterAction.Exit)
                     importer = new CoachesImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.Conferences:
-                    //importer = new ConferencesImporter(importerConfig, importerLogger);
+                    importer = new ConferencesImporter(importerConfig, importerLogger);
+                    break;
+                case ImportType.ConferenceMemberships:
+                    importer = new ConferenceMembershipsImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.DraftPicks:
-                    //importer = new DraftPicksImporter(importerConfig, importerLogger);
+                    importer = new DraftPicksImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.Games:
-                    //importer = new GamesImporter(importerConfig, importerLogger);
+                    importer = new GamesImporter(importerConfig, importerLogger);
                     break;
-                case ImportType.Players:
-                    //importer = new PlayersImporter(importerConfig, importerLogger);
+                case ImportType.PlayersAndRosters:
+                    importer = new PlayersImporter(importerConfig, importerLogger);
                     break;
-                case ImportType.PlayerGameStats:
-                    //importer = new PlayerGameStatsImporter(importerConfig, importerLogger);
+                case ImportType.PlayerSeasonStats:
+                    importer = new PlayerSeasonStatsImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.Polls:
-                   // importer = new PollsImporter(importerConfig, importerLogger);
-                    break;
-                case ImportType.Rosters:
-                    //importer = new RostersImporter(importerConfig, importerLogger);
+                    importer = new PollsImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.Teams:
                     importer = new TeamsImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.TeamGameStats:
-                    //importer = new TeamGameStatsImporter(importerConfig, importerLogger);
+                    importer = new TeamGameStatsImporter(importerConfig, importerLogger);
                     break;
                 default:
                     Console.WriteLine("Invalid import type.");
@@ -139,7 +153,7 @@ int GetAction()
     int actionChoice = 0;
     while (!validAction)
     {
-        Console.WriteLine("\nChoose an action: (Enter the number");
+        Console.WriteLine("\nChoose an action (Enter the number):");
         Enum.GetValues<ImporterAction>().ToList().ForEach(action =>
         {
             Console.WriteLine($"{(int)action}: {action}");
@@ -167,12 +181,12 @@ public enum ImportType
 {
     Coaches,
     Conferences,
+    ConferenceMemberships,
     DraftPicks,
     Games,
-    Players,
-    PlayerGameStats,
+    PlayersAndRosters,
+    PlayerSeasonStats,
     Polls,
-    Rosters,
     Teams,
     TeamGameStats,
 }

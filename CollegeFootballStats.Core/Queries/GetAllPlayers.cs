@@ -1,11 +1,12 @@
 ﻿namespace CollegeFootballStats.Core.Queries
 {
-    public class GetTeams : SqlCommandBase
+    public class GetAllPlayers : SqlCommandBase
     {
         public override string Text => @"
             SELECT
-                *   
+                *
             FROM    
-                Team t";
+                Player
+        ";
     }
 }
