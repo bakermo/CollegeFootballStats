@@ -44,7 +44,7 @@ namespace CollegeFootballStats.Importer
                     dataTable.Clear();
                     _logger.LogInformation($"Beginning import for season: {season}");
                     string queryUrl = $"stats/player/season?year={season}";
-                    var playerSeasonStats = (await _httpClient.GetFromJsonAsync<List<PlayerSeasonStatResponse>>(queryUrl))?
+                    var playerSeasonStats = (await _v1APIClient.GetFromJsonAsync<List<PlayerSeasonStatResponse>>(queryUrl))?
                         .ToList() ?? new List<PlayerSeasonStatResponse>();
 
                     _logger.LogInformation($"Found {playerSeasonStats?.Count ?? 0:N0} for season {season}");

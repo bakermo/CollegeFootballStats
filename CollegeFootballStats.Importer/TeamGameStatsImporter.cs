@@ -50,9 +50,9 @@ namespace CollegeFootballStats.Importer
                         // we can't use 'both' for seeason type on this endpoint, throws an error
                         // so unfortunately I have to fetch both
                         string queryUrl = $"games/teams?year={season}&week={week}";
-                        var regularSeasonGames = await _httpClient.GetFromJsonAsync<List<TeamGameStatResponse>>($"{queryUrl}&seasonType=regular");
+                        var regularSeasonGames = await _v1APIClient.GetFromJsonAsync<List<TeamGameStatResponse>>($"{queryUrl}&seasonType=regular");
                         _logger.LogInformation($"Found stats for {regularSeasonGames?.Count ?? 0} regular season games for week {week} of season {season}");
-                        var postSeasonGames = await _httpClient.GetFromJsonAsync<List<TeamGameStatResponse>>($"{queryUrl}&seasonType=postseason");
+                        var postSeasonGames = await _v1APIClient.GetFromJsonAsync<List<TeamGameStatResponse>>($"{queryUrl}&seasonType=postseason");
                         _logger.LogInformation($"Found stats for {postSeasonGames?.Count ?? 0} post season games for week {week} of season {season}");
 
                         allGames.AddRange(regularSeasonGames?.ToList() ?? new List<TeamGameStatResponse>());

@@ -25,7 +25,7 @@ namespace CollegeFootballStats.Importer
             _logger.LogInformation("Fetching coaches from API...");
             try
             {
-                var response = await _httpClient.GetFromJsonAsync<List<CoachResponse>>("coaches?minYear=2000&maxYear=2024");
+                var response = await _v1APIClient.GetFromJsonAsync<List<CoachResponse>>("coaches?minYear=2000&maxYear=2024");
                 if (response == null)
                 {
                     _logger.LogWarning("No coaches fetched. Exiting...");

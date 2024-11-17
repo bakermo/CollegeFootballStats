@@ -17,7 +17,7 @@ namespace CollegeFootballStats.Importer
 
             try
             {
-                var response = await _httpClient.GetFromJsonAsync<List<ConferenceResponse>>("conferences");
+                var response = await _v1APIClient.GetFromJsonAsync<List<ConferenceResponse>>("conferences");
 
                 if (response == null)
                 {

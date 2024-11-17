@@ -11,6 +11,8 @@ namespace CollegeFootballStats.Importer
     {
         public int Id { get; set; }
         public string School { get; set; } = string.Empty;
+        public string? Conference { get; set;} = string.Empty;
+        public string? Classification { get; set;} = string.Empty;
 
         // yes...abbreviation is nullable in the api...guessing we wont use those teams much
         public string? Abbreviation { get; set; }

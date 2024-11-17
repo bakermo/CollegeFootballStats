@@ -25,7 +25,7 @@ CREATE TABLE Conference(
 	ConferenceID INT NOT NULL,
 	ShortName VARCHAR2(50),
 	Name VARCHAR2(100),
-	Division VARCHAR2(20),
+	Classification VARCHAR2(20),
 	Abbreviation VARCHAR2(20),
 	PRIMARY KEY(ConferenceID)
 );

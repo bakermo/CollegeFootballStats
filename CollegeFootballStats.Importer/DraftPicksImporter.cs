@@ -39,7 +39,7 @@ namespace CollegeFootballStats.Importer
                 for (int season = DEFAULT_MIN_SEASON; season <= DEFAULT_MAX_SEASON; season++)
                 {
                     _logger.LogInformation($"Fetching draft picks for {season}...");
-                    var response = await _httpClient.GetFromJsonAsync<List<DraftPickResponse>>($"draft/picks?year={season}");
+                    var response = await _v1APIClient.GetFromJsonAsync<List<DraftPickResponse>>($"draft/picks?year={season}");
 
                     _logger.LogInformation($"Fetched {response.Count} draft picks for {season}");
 

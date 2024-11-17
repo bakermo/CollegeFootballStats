@@ -14,12 +14,14 @@ var builder = new ConfigurationBuilder()
 IConfiguration configuration = builder.Build();
 
 var connectionString = configuration.GetConnectionString("UFOracle");
-var apiUrl = configuration["CollegeFootballDataApi:Url"];
+var apiV1Url = configuration["CollegeFootballDataApi:V1Url"];
+var apiV2Url = configuration["CollegeFootballDataApi:V2Url"];
 var apiKey = configuration["CollegeFootballDataApi:ApiKey"];
 
 
 Console.WriteLine($"Connection String: {connectionString}");
-Console.WriteLine($"API Url: {apiUrl}");
+Console.WriteLine($"API V1 Url: {apiV1Url}");
+Console.WriteLine($"API V2 Url: {apiV2Url}");
 Console.WriteLine($"API Key: {apiKey}");
 
 int workerThreads, completionPortThreads;
@@ -54,7 +56,7 @@ SqlMapper.AddTypeHandler(typeof(bool), new BoolToNumberHandler());
 // Instantiate the importer and pass the logger
 var importerLogger = serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Program>>();
 
-var importerConfig = new ImporterConfig(connectionString, apiUrl, apiKey);
+var importerConfig = new ImporterConfig(connectionString, apiV1Url, apiKey, apiV2Url);
 
 int actionChoice = GetAction();
 
@@ -72,6 +74,9 @@ while (actionChoice != (int)ImporterAction.Exit)
                     break;
                 case ImportType.Conferences:
                     importer = new ConferencesImporter(importerConfig, importerLogger);
+                    break;
+                case ImportType.ConferenceMemberships:
+                    importer = new ConferenceMembershipsImporter(importerConfig, importerLogger);
                     break;
                 case ImportType.DraftPicks:
                     importer = new DraftPicksImporter(importerConfig, importerLogger);
@@ -176,6 +181,7 @@ public enum ImportType
 {
     Coaches,
     Conferences,
+    ConferenceMemberships,
     DraftPicks,
     Games,
     PlayersAndRosters,

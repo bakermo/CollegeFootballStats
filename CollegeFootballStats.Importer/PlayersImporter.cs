@@ -28,7 +28,7 @@ namespace CollegeFootballStats.Importer
                 _logger.LogInformation("Fetching rosters from API...");
                 for (int season = DEFAULT_MIN_SEASON; season <= DEFAULT_MAX_SEASON; season++)
                 {
-                    var response = await _httpClient.GetFromJsonAsync<List<RosterResponse>>($"roster?year={season}");
+                    var response = await _v1APIClient.GetFromJsonAsync<List<RosterResponse>>($"roster?year={season}");
 
                     if (response == null)
                     {

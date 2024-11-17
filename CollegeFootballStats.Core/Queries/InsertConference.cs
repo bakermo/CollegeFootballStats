@@ -9,7 +9,7 @@
                 ConferenceId = conferenceId,
                 ShortName = name,
                 Name = shortName,
-                Division = classification,
+                Classification = classification,
                 Abbreviation = abbreviation
             };
         }
@@ -20,7 +20,7 @@
                 ConferenceID,
                 ShortName,
                 Name,
-                Division,
+                Classification,
                 Abbreviation
             )
             VALUES
@@ -28,7 +28,7 @@
                 :ConferenceId,
                 :ShortName,
                 :Name,
-                :Division,
+                :Classification,
                 :Abbreviation
             )
         ";

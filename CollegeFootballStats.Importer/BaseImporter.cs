@@ -7,7 +7,8 @@ namespace CollegeFootballStats.Importer
 {
     internal abstract class BaseImporter
     {
-        protected readonly HttpClient _httpClient;
+        protected readonly HttpClient _v1APIClient;
+        protected readonly HttpClient _v2APIClient;
         protected readonly SqlCommandManager _sqlCommandManager;
         protected readonly ILogger _logger;
         /* 
@@ -43,10 +44,22 @@ namespace CollegeFootballStats.Importer
         public BaseImporter(ImporterConfig config, ILogger logger)
         {
             _logger = logger;
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri(config.ApiUrl);
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + config.ApiKey);
+            _v1APIClient = ConfigureClient(config.ApiV1URL, config.ApiKey);
+
+            if (!string.IsNullOrEmpty(config.ApiV2URL))
+            {
+                _v2APIClient = ConfigureClient(config.ApiV2URL, config.ApiKey);
+            }
+
             _sqlCommandManager = new SqlCommandManager(config.ConnectionString);
+        }
+
+        private HttpClient ConfigureClient(string url, string apiKey)
+        {
+            var client = new HttpClient();
+            client.BaseAddress = new Uri(url);
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + apiKey);
+            return client;
         }
 
         public abstract Task ImportAsync();

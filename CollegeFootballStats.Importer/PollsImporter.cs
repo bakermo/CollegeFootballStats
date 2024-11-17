@@ -29,7 +29,7 @@ namespace CollegeFootballStats.Importer
             {
                 for (int i = DEFAULT_MIN_SEASON; i <= DEFAULT_MAX_SEASON; i++)
                 {
-                    var response = await _httpClient.GetFromJsonAsync<List<PollResponse>>($"rankings?year={i}&seasonType=both");
+                    var response = await _v1APIClient.GetFromJsonAsync<List<PollResponse>>($"rankings?year={i}&seasonType=both");
                     _logger.LogInformation($"Fetched {response.Count} regular and postseason polls for {i} Season: ");
                     foreach (var pollResponse in response)
                     {
