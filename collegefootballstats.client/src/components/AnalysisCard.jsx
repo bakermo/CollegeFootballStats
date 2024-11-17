@@ -13,8 +13,11 @@ export default function AnalysisCard({ title, description, path }) {
                 height: '200px',
                 cursor: 'pointer',
                 backgroundColor: '#fff',
+                transition: 'all 0.3s ease-in-out', // Smooth transition for all changes
                 '&:hover': {
-                    backgroundColor: '#3F4C64',
+                    backgroundColor: '#262a42',
+                    transform: 'translateY(-4px)', // Slight lift effect
+                    boxShadow: '0 6px 12px rgba(82, 101, 156, 0.2)', // Custom shadow matching hover color
                     '& .card-text': {
                         color: '#fff'
                     },
@@ -40,7 +43,8 @@ export default function AnalysisCard({ title, description, path }) {
                         fontWeight: 600,
                         mb: 1,
                         color: '#212D40',
-                        fontFamily: 'Georgia, serif'
+                        fontFamily: 'Georgia, serif',
+                        transition: 'color 0.3s ease-in-out' // Smooth color transition
                     }}
                 >
                     {title}
@@ -52,7 +56,8 @@ export default function AnalysisCard({ title, description, path }) {
                         fontSize: '0.875rem',
                         color: '#666',
                         fontWeight: 400,
-                        lineHeight: 1.5
+                        lineHeight: 1.5,
+                        transition: 'color 0.3s ease-in-out' // Smooth color transition
                     }}
                 >
                     {description}
