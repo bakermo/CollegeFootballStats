@@ -30,7 +30,7 @@ namespace CollegeFootballStats.Importer
             try
             {
                 _logger.LogInformation("Beginning import. This may take a while...");
-                for (int season = DEFAULT_MIN_SEASON; season <= DEFAULT_MAX_SEASON; season++)
+                for (int season = 2017; season <= DEFAULT_MAX_SEASON; season++)
                 {
                     _logger.LogInformation($"Beginning import for season: {season}");
                     for (int week = MIN_SEASON_WEEK; week <= MAX_SEASON_WEEK; week++)

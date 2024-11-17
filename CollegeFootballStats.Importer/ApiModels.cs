@@ -154,4 +154,55 @@ namespace CollegeFootballStats.Importer
         public string Category { get; set; } = string.Empty;
         public string Stat { get; set; } = string.Empty;
     }
+
+    internal class PlayerGameStatResponse
+    {
+        /// <summary>
+        /// The game ID
+        /// </summary>
+        public int Id { get; set; }
+        public List<PlayerGameStatTeam> Teams { get; set; }
+        public PlayerGameStatResponse()
+        {
+            Teams = new List<PlayerGameStatTeam>();
+        }
+    }
+
+    internal class PlayerGameStatTeam
+    {
+        // it gives us the school too but we don't really care
+        public List<PlayerGameStatCategory> Categories { get; set; }
+        public PlayerGameStatTeam()
+        {
+            Categories = new List<PlayerGameStatCategory>();
+        }
+    }
+
+    internal class PlayerGameStatCategory
+    {
+        public string Name { get; set; } = string.Empty;
+        public List<PlayerGameStatType> Types { get; set; }
+        public PlayerGameStatCategory()
+        {
+            Types = new List<PlayerGameStatType>();
+        }
+    }
+
+    internal class PlayerGameStatType
+    {
+        public string Name { get; set; } = string.Empty;
+        public List<PlayerGameStatAthlete> Athletes { get; set; }
+        public PlayerGameStatType()
+        {
+            Athletes = new List<PlayerGameStatAthlete>();
+        }
+    }
+
+    internal class PlayerGameStatAthlete
+    {
+        // PlayerId
+        public int? Id { get; set; }
+        public string Name { get; set; } = string.Empty;   
+        public string Stat { get; set; } = string.Empty;
+    }
 }
