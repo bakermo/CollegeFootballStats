@@ -80,7 +80,12 @@ namespace CollegeFootballStats.Core
             return Task.CompletedTask;
         }
 
-        public void BulkInsert(DataTable dataTable)
+        /// <summary>
+        /// Returns the number of rows inserted by the bulk insert
+        /// </summary>
+        /// <param name="dataTable"></param>
+        /// <returns></returns>
+        public int BulkInsert(DataTable dataTable)
         {
             using var conn = new OracleConnection(_connectionString);
             {
@@ -88,7 +93,7 @@ namespace CollegeFootballStats.Core
                 using (OracleBulkCopy bulkCopy = new OracleBulkCopy(conn))
                 {
                     bulkCopy.DestinationSchemaName = "\"MATTHEW.BAKER\"";
-                    bulkCopy.DestinationTableName = dataTable.TableName;// "PLAYERSEASONSTAT";
+                    bulkCopy.DestinationTableName = dataTable.TableName;
                     bulkCopy.BatchSize = 1000;
                     foreach (var column in dataTable.Columns)
                     {
@@ -98,10 +103,14 @@ namespace CollegeFootballStats.Core
                     {
                         bulkCopy.WriteToServer(dataTable);
                         Console.WriteLine("Bulk insert completed successfully.");
+                        int rowsInserted = dataTable.Rows.Count;
+                        dataTable.Clear(); // safety thing, in case the caller forgets, lol
+                        return rowsInserted;
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Error during bulk insert: {ex.Message} {ex.StackTrace} {ex.InnerException}");
+                        throw;
                     }
                 }
             }

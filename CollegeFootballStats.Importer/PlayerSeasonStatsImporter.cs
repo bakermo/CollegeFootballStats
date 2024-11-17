@@ -70,8 +70,8 @@ namespace CollegeFootballStats.Importer
 
                     if (dataTable.Rows.Count > 0)
                     {
-                        _sqlCommandManager.BulkInsert(dataTable);
-                        _logger.LogInformation($"Inserted {seasonStatsImported:N0} player season stats for season {season}");
+                        var rowsInserted = _sqlCommandManager.BulkInsert(dataTable);
+                        _logger.LogInformation($"Inserted {rowsInserted:N0} player season stats for season {season}");
                     }
                     else
                     {
