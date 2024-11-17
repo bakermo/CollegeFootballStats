@@ -50,20 +50,34 @@ function Home() {
                     flexDirection: 'column'
                 }}
             >
-                <Typography
-                    variant="h1"
-                    component="h1"
-                    align="center"
-                    gutterBottom
-                    sx={{
-                        fontSize: '2rem',
-                        fontWeight: 500,
-                        mb: 6,
-                        color: '#212D40'
-                    }}
-                >
-                    Your GO-TO hub for College Football Stat analysis and visualization
-                </Typography>
+                <Box sx={{ textAlign: 'center', mb: 6 }}>
+                    <Typography
+                        variant="h2"
+                        component="h1"
+                        sx={{
+                            color: '#212D40',
+                            fontFamily: 'Georgia, serif',
+                            fontSize: '2.5rem',
+                            fontWeight: 700,
+                            mb: 2
+                        }}
+                    >
+                        College Football Stat Hub
+                    </Typography>
+                    <Typography
+                        variant="h4"
+                        component="h2"
+                        sx={{
+                            color: '#3F4C64',
+                            fontFamily: 'Georgia, serif',
+                            fontSize: '1.75rem',
+                            fontWeight: 600,
+                            mb: 2
+                        }}
+                    >
+                        Your GO-TO hub for College Football Stat analysis and visualization
+                    </Typography>
+                </Box>
 
                 <Box sx={{
                     display: 'flex',
@@ -87,7 +101,14 @@ function Home() {
                         gap: 2,
                         backgroundColor: '#fff'
                     }}>
-                        <Typography variant="h6">
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontFamily: 'Georgia, serif',
+                                color: '#212D40',
+                                fontWeight: 600
+                            }}
+                        >
                             Shows all of the tuples found within the our database
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 2 }}>

@@ -17,6 +17,9 @@ export default function AnalysisCard({ title, description, path }) {
                     backgroundColor: '#3F4C64',
                     '& .card-text': {
                         color: '#fff'
+                    },
+                    '& .card-description': {
+                        color: 'rgba(255, 255, 255, 0.8)'
                     }
                 }
             }}
@@ -26,27 +29,30 @@ export default function AnalysisCard({ title, description, path }) {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
-                p: 2
+                p: 3
             }}>
                 <Typography
                     className="card-text"
                     variant="h2"
                     component="h2"
                     sx={{
-                        fontSize: '1.25rem',
-                        fontWeight: 500,
+                        fontSize: '1.5rem',
+                        fontWeight: 600,
                         mb: 1,
-                        color: '#212D40'
+                        color: '#212D40',
+                        fontFamily: 'Georgia, serif'
                     }}
                 >
                     {title}
                 </Typography>
                 <Typography
-                    className="card-text"
+                    className="card-description"
                     variant="body2"
                     sx={{
                         fontSize: '0.875rem',
-                        color: 'text.secondary'
+                        color: '#666',
+                        fontWeight: 400,
+                        lineHeight: 1.5
                     }}
                 >
                     {description}
@@ -54,12 +60,12 @@ export default function AnalysisCard({ title, description, path }) {
             </Box>
             <Box sx={{
                 width: '50%',
-                bgcolor: '#f5f5f5',
+                backgroundColor: '#f5f5f5',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
             }}>
-                <Typography sx={{ color: 'text.secondary' }}>
+                <Typography sx={{ color: '#666' }}>
                     Image Placeholder
                 </Typography>
             </Box>
