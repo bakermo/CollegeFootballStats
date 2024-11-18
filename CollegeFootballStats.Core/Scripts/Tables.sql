@@ -16,17 +16,17 @@ CREATE TABLE Player(
 	PRIMARY KEY(PlayerID)
 );
 CREATE TABLE Coach(
-	CoachID INT NOT NULL,
+	CoachID INT GENERATED ALWAYS AS IDENTITY,
 	FirstName VARCHAR2(50),
 	LastName VARCHAR2(50),
 	PRIMARY KEY(CoachID)
 );
 CREATE TABLE Conference(
 	ConferenceID INT NOT NULL,
-	Name VARCHAR2(50),
 	ShortName VARCHAR2(50),
+	Name VARCHAR2(100),
 	Classification VARCHAR2(20),
-	Division VARCHAR2(20),
+	Abbreviation VARCHAR2(20),
 	PRIMARY KEY(ConferenceID)
 );
 CREATE TABLE Game(
@@ -38,34 +38,42 @@ CREATE TABLE Game(
 	HomePoints INT,
 	AwayTeam INT NOT NULL,
 	AwayPoints INT,
+	IsCompleted NUMBER(1),
+	IsPostseason NUMBER(1),
 	PRIMARY KEY(GameID),
-   	 FOREIGN KEY(HomeTeam) REFERENCES Team(TeamID),
-    	FOREIGN KEY(AwayTeam) REFERENCES Team(TeamID)
+   	FOREIGN KEY(HomeTeam) REFERENCES Team(TeamID),
+    FOREIGN KEY(AwayTeam) REFERENCES Team(TeamID)
 );
 CREATE TABLE DraftPick(
-	DraftPickID INT NOT NULL,
-	Year INT,
-	Round INT,
+	DraftPickID INT GENERATED ALWAYS AS IDENTITY,
+	PlayerID INT NOT NULL,
 	CollegeTeam INT NOT NULL,
 	NFLTeam VARCHAR2(50),
 	Position VARCHAR2(20),
+	Year INT,
+	Round INT,
+	RoundPick INT,
 	OverallPick INT,
 	PRIMARY KEY(DraftPickID),
+	FOREIGN KEY(PlayerID) REFERENCES Player(PlayerID),
 	FOREIGN KEY(CollegeTeam) REFERENCES Team(TeamID)
 );
 CREATE TABLE Roster(
-	Year INT NOT NULL,
 	TeamID INT NOT NULL,
 	PlayerID INT NOT NULL,
-	PRIMARY KEY(PlayerID, TeamID, Year),
+	Season INT NOT NULL,
+	PRIMARY KEY(PlayerID, TeamID, Season),
 	FOREIGN KEY(PlayerID) REFERENCES Player(PlayerID),
 	FOREIGN KEY(TeamID) REFERENCES Team(TeamID)
 );
 CREATE TABLE Poll(
-	PollID INT NOT NULL,
+	PollID INT GENERATED ALWAYS AS IDENTITY,
+	PollName VarChar2(50),
 	TeamID INT NOT NULL,
 	Season INT,
 	Week INT,
+	Rank INT NOT NULL,
+	IsPostseason NUMBER(1),
 	PRIMARY KEY(PollID),
 	FOREIGN KEY(TeamID) REFERENCES Team(TeamID)
 );
@@ -73,6 +81,7 @@ CREATE TABLE CoachingRecord(
 	CoachID INT NOT NULL,
 	TeamID INT NOT NULL,
 	Year INT NOT NULL,	
+	Games INT,
 	Wins INT,
 	Losses INT,
 	Ties INT,
@@ -89,8 +98,8 @@ CREATE TABLE ConferenceMembership(
 	FOREIGN KEY(TeamID) REFERENCES Team(TeamID)
 );
 CREATE TABLE TeamGameStat(
-	StatID INT NOT NULL,
-	StatValue INT,
+	StatID INT GENERATED ALWAYS AS IDENTITY,
+	StatValue NUMBER,
 	StatCategory VARCHAR2(50),
 	Game INT NOT NULL,
 	Team INT NOT NULL,
@@ -98,14 +107,13 @@ CREATE TABLE TeamGameStat(
 	FOREIGN KEY (Game) REFERENCES Game(GameID),
 	FOREIGN KEY (Team) REFERENCES Team(TeamID)
 );	
-CREATE TABLE PlayerGameStat(
-	StatID INT NOT NULL,
-	StatValue INT,
+CREATE TABLE PlayerSeasonStat(
+	StatID INT GENERATED ALWAYS AS IDENTITY,
+	StatValue NUMBER,
 	StatType VARCHAR2(20),
 	StatCategory VARCHAR2(20),
-	Game INT NOT NULL,
+	Season INT NOT NULL,
 	Player INT NOT NULL,
 	PRIMARY KEY(StatID),
-	FOREIGN KEY (Game) REFERENCES Game(GameID),
 	FOREIGN KEY (Player) REFERENCES Player(PlayerID)
 );
