@@ -3,6 +3,9 @@ using CollegeFootballStats.Core.Models;
 using CollegeFootballStats.Core;
 using Dapper;
 using CollegeFootballStats.Server;
+using Oracle.ManagedDataAccess.Client;
+using System.Data.SqlClient;
+using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +68,22 @@ app.MapGet("/team/{abbreviation}", async(SqlCommandManager queryManager, string 
     return Results.Ok(team);
 });
 
+app.MapGet("/team-recruiting-draft-data", async (SqlCommandManager queryManager, int startYear, int endYear) =>
+{
+    var query = new GetTeamRecruitingAndDraft(startYear, endYear);
+
+    var data = await queryManager.QueryAsync<TeamRecruitingAndDraftResult>(query);
+    return Results.Ok(data);
+});
+
+app.MapGet("/teams/draft-performance", async (SqlCommandManager queryManager, int teamId, int conferenceId, int startSeason, int endSeason) =>
+{
+    ISqlCommand query = new GetTeamDraftPerformance(teamId, conferenceId, startSeason, endSeason);
+    var result = await queryManager.QueryAsync<TeamDraftPerformance>(query);
+    return Results.Ok(result);
+});
+
+
 app.MapGet("/tuples", async (SqlCommandManager queryManager) => {
     // yes. This is inefficient. Yes. there is a better way to do this in one query
     // but right now im tired and don't care
@@ -84,6 +103,38 @@ app.MapGet("/tuples", async (SqlCommandManager queryManager) => {
     response.TotalTuples = response.Teams + response.Coaches + response.CoachingRecords + response.Conferences + response.ConferenceMemberships + response.DraftPicks + response.Games + response.Rosters + response.Players + response.Polls + response.PlayerSeasonStats + response.TeamGameStats;
 
     return Results.Ok(response);
+});
+
+app.MapGet("/players", async (SqlCommandManager queryManager) =>
+{
+    ISqlCommand query = new GetAllPlayers();
+    var players = await queryManager.QueryAsync<Player>(query);
+    return Results.Ok(players.ToList());
+});
+
+app.MapGet("/conferences", async (SqlCommandManager queryManager) =>
+{
+    ISqlCommand query = new GetAllConferences();
+    var conferences = await queryManager
+        .QueryAsync<Conference>(query);
+
+    return Results.Ok(conferences.ToList());
+});
+
+app.MapGet("/coaches", async (SqlCommandManager queryManager) =>
+{
+    ISqlCommand query = new GetAllCoaches();
+    var coaches = await queryManager
+        .QueryAsync<Coach>(query);
+
+    return Results.Ok(coaches.ToList());
+});
+
+app.MapGet("/player-positions", async (SqlCommandManager queryManager) =>
+{
+    var query = new GetAllPlayerPositions();
+    var result = await queryManager.QueryAsync<PlayerPosition>(query);
+    return Results.Ok(result);
 });
 
 app.MapFallbackToFile("/index.html");

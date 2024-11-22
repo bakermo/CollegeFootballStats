@@ -1,12 +1,53 @@
 import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper } from '@mui/material';
 import Header from '../components/Header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function SidelineShuffle() {
-    const [seasonRange, setSeasonRange] = useState([4, 24]);
+    const [seasonRange, setSeasonRange] = useState([2004, 2024]);
     const [selectedTeam, setSelectedTeam] = useState('');
     const [selectedCoach, setSelectedCoach] = useState('');
+    const [teams, setTeams] = useState([]);
+    const [coaches, setCoaches] = useState([]);
     const [visualizationData, setVisualizationData] = useState(null);
+
+    useEffect(() => {
+        fetchTeams();
+        fetchCoaches();
+    }, []);
+
+    const fetchTeams = async () => {
+        try {
+            const response = await fetch('/api/teams');
+            const data = await response.json();
+            console.log('Teams fetched:', data);
+            if (Array.isArray(data)) {
+                setTeams(data);
+            } else {
+                console.warn('Unexpected teams response format', data);
+                setTeams([]);
+            }
+        } catch (error) {
+            console.error('Error fetching teams:', error);
+            setTeams([]);
+        }
+    };
+
+    const fetchCoaches = async () => {
+        try {
+            const response = await fetch('/api/coaches');
+            const data = await response.json();
+            console.log('Coaches fetched:', data);
+            if (Array.isArray(data)) {
+                setCoaches(data);
+            } else {
+                console.warn('Unexpected coaches response format', data);
+                setCoaches([]);
+            }
+        } catch (error) {
+            console.error('Error fetching coaches:', error);
+            setCoaches([]);
+        }
+    };
 
     const handleSeasonChange = (event, newValue) => {
         setSeasonRange(newValue);
@@ -21,7 +62,7 @@ function SidelineShuffle() {
     };
 
     const handleReset = () => {
-        setSeasonRange([4, 24]);
+        setSeasonRange([2004, 2024]);
         setSelectedTeam('');
         setSelectedCoach('');
         setVisualizationData(null);
@@ -113,9 +154,9 @@ function SidelineShuffle() {
                                 value={seasonRange}
                                 onChange={handleSeasonChange}
                                 valueLabelDisplay="auto"
-                                min={4}
-                                max={24}
-                                valueLabelFormat={(value) => `20${value.toString().padStart(2, '0')}`}
+                                min={2004}
+                                max={2024}
+                                valueLabelFormat={(value) => `${value}`}
                                 sx={{
                                     color: '#3F4C64',
                                     '& .MuiSlider-thumb': {
@@ -180,6 +221,17 @@ function SidelineShuffle() {
                             <MenuItem value="">
                                 <em>Select a team...</em>
                             </MenuItem>
+                            {teams.length > 0 ? (
+                                teams.map((team) => (
+                                    <MenuItem key={team.teamId} value={team.teamId}>
+                                        {team.school}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>
+                                    <em>Loading teams...</em>
+                                </MenuItem>
+                            )}
                         </Select>
                     </Box>
 
@@ -197,6 +249,17 @@ function SidelineShuffle() {
                             <MenuItem value="">
                                 <em>Select a coach...</em>
                             </MenuItem>
+                            {coaches.length > 0 ? (
+                                coaches.map((coach) => (
+                                    <MenuItem key={coach.coachId} value={coach.coachId}>
+                                        {`${coach.firstName} ${coach.lastName}`}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>
+                                    <em>Loading coaches...</em>
+                                </MenuItem>
+                            )}
                         </Select>
                     </Box>
 

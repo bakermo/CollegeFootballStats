@@ -1,6 +1,8 @@
 import { Box, Container, Typography, Button, Card } from '@mui/material';
+import { useState } from 'react';
 import AnalysisCard from '../components/AnalysisCard.jsx';
 import Header from '../components/Header.jsx';
+import axios from 'axios';
 
 const analysisCards = [
     {
@@ -31,6 +33,28 @@ const analysisCards = [
 ];
 
 function Home() {
+    const [tupleCount, setTupleCount] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const fetchTupleCount = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await axios.get('/api/tuples');
+            if (response && response.data) {
+                setTupleCount(response.data.totalTuples);
+            } else {
+                throw new Error("Invalid response data");
+            }
+        } catch (err) {
+            console.error("Error fetching tuple count:", err);
+            setError("Failed to fetch tuple count. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <Box sx={{
             minHeight: '100vh',
@@ -113,6 +137,7 @@ function Home() {
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 2 }}>
                             <Button
+                                onClick={fetchTupleCount}
                                 variant="contained"
                                 sx={{
                                     backgroundColor: '#3F4C64',
@@ -123,20 +148,16 @@ function Home() {
                             >
                                 Show Total Tuples
                             </Button>
-                            <Button
-                                variant="outlined"
-                                sx={{
-                                    color: '#3F4C64',
-                                    borderColor: '#3F4C64',
-                                    '&:hover': {
-                                        borderColor: '#212D40',
-                                        color: '#212D40'
-                                    }
-                                }}
-                            >
-                                Tuples here
-                            </Button>
                         </Box>
+
+                        {loading && <Typography>Loading...</Typography>}
+                        {error && <Typography color="error">{error}</Typography>}
+
+                        {tupleCount !== null && !loading && (
+                            <Typography>
+                                Total Tuples: {tupleCount}
+                            </Typography>
+                        )}
                     </Card>
                 </Box>
             </Container>

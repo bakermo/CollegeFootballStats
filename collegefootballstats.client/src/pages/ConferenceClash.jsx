@@ -1,12 +1,26 @@
 import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper, RadioGroup, FormControlLabel, Radio, FormControl } from '@mui/material';
 import Header from '../components/Header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function ConferenceClash() {
-    const [seasonRange, setSeasonRange] = useState([4, 24]);
+    const [seasonRange, setSeasonRange] = useState([2004, 2024]);
     const [selectedConference, setSelectedConference] = useState('');
+    const [conferences, setConferences] = useState([]);
     const [visualizationData, setVisualizationData] = useState(null);
     const [analysisType, setAnalysisType] = useState('offensive'); // 'offensive' or 'defensive'
+
+    useEffect(() => {
+        const fetchConferences = async () => {
+            try {
+                const response = await fetch("/api/conferences"); // Backend endpoint
+                const data = await response.json();
+                setConferences(data);
+            } catch (error) {
+                console.error("Error fetching conferences:", error);
+            }
+        };
+        fetchConferences();
+    }, []);
 
     const handleSeasonChange = (event, newValue) => {
         setSeasonRange(newValue);
@@ -21,7 +35,7 @@ function ConferenceClash() {
     };
 
     const handleReset = () => {
-        setSeasonRange([4, 24]);
+        setSeasonRange([2004, 2024]);
         setSelectedConference('');
         setVisualizationData(null);
         setAnalysisType('offensive');
@@ -113,9 +127,9 @@ function ConferenceClash() {
                                 value={seasonRange}
                                 onChange={handleSeasonChange}
                                 valueLabelDisplay="auto"
-                                min={4}
-                                max={24}
-                                valueLabelFormat={(value) => `20${value.toString().padStart(2, '0')}`}
+                                min={2004}
+                                max={2024}
+                                valueLabelFormat={(value) => `${value}`}
                                 sx={{
                                     color: '#3F4C64',
                                     '& .MuiSlider-thumb': {
@@ -150,7 +164,7 @@ function ConferenceClash() {
                                     left: '2px'
                                 }}
                             >
-                                04'
+                                '04
                             </Typography>
                             <Typography
                                 variant="body2"
@@ -161,7 +175,7 @@ function ConferenceClash() {
                                     right: '2px'
                                 }}
                             >
-                                24'
+                                '24
                             </Typography>
                         </Box>
                     </Box>
@@ -216,6 +230,17 @@ function ConferenceClash() {
                             <MenuItem value="">
                                 <em>Select a conference...</em>
                             </MenuItem>
+                            {conferences.length > 0 ? (
+                                conferences.map((conference) => (
+                                    <MenuItem key={conference.conferenceId} value={conference.conferenceId}>
+                                        {conference.name}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>
+                                    <em>Loading conferences...</em>
+                                </MenuItem>
+                            )}
                         </Select>
                     </Box>
 

@@ -1,13 +1,55 @@
 import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper, RadioGroup, FormControlLabel, Radio, FormControl } from '@mui/material';
 import Header from '../components/Header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 function StarPower() {
-    const [seasonRange, setSeasonRange] = useState([4, 24]);
+    const [seasonRange, setSeasonRange] = useState([2004, 2024]);
     const [selectedTeam, setSelectedTeam] = useState('');
     const [selectedConference, setSelectedConference] = useState('');
-    const [visualizationData, setVisualizationData] = useState(null);
+    const [teams, setTeams] = useState([]);
+    const [conferences, setConferences] = useState([]);
+    const [visualizationData, setVisualizationData] = useState([]);
     const [selectionType, setSelectionType] = useState('team'); // 'team' or 'conference'
+
+    useEffect(() => {
+        fetchTeams();
+        fetchConferences();
+    }, []);
+
+    const fetchTeams = async () => {
+        try {
+            const response = await fetch('/api/teams');
+            const data = await response.json();
+            console.log('Teams fetched:', data);
+            if (Array.isArray(data)) {
+                setTeams(data);
+            } else {
+                console.warn('Unexpected teams response format', data);
+                setTeams([]);
+            }
+        } catch (error) {
+            console.error('Error fetching teams:', error);
+            setTeams([]);
+        }
+    };
+
+    const fetchConferences = async () => {
+        try {
+            const response = await fetch('/api/conferences');
+            const data = await response.json();
+            console.log('Conferences fetched:', data);
+            if (Array.isArray(data)) {
+                setConferences(data);
+            } else {
+                console.warn('Unexpected conferences response format', data);
+                setConferences([]);
+            }
+        } catch (error) {
+            console.error('Error fetching conferences:', error);
+            setConferences([]);
+        }
+    };
 
     const handleSeasonChange = (event, newValue) => {
         setSeasonRange(newValue);
@@ -28,20 +70,33 @@ function StarPower() {
     };
 
     const handleReset = () => {
-        setSeasonRange([4, 24]);
+        setSeasonRange([2004, 2024]);
         setSelectedTeam('');
         setSelectedConference('');
-        setVisualizationData(null);
+        setVisualizationData([]);
     };
 
-    const generateVisualization = () => {
-        console.log('Generating visualization with:', {
-            seasonRange,
-            selectionType,
-            team: selectedTeam,
-            conference: selectedConference
-        });
+    const generateVisualization = async () => {
+        try {
+            const response = await fetch(`/api/teams/draft-performance?team=${selectedTeam}&conference=${selectedConference}&startSeason=${seasonRange[0]}&endSeason=${seasonRange[1]}`);
+            const data = await response.json();
+            console.log('Visualization data fetched:', data); // Debugging statement
+            if (Array.isArray(data) && data.length > 0) {
+                setVisualizationData(data);
+            } else {
+                setVisualizationData([]);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setVisualizationData([]);
+        }
     };
+
+    useEffect(() => {
+        if (selectedTeam || selectedConference) {
+            generateVisualization();
+        }
+    }, [selectedTeam, selectedConference, seasonRange]);
 
     return (
         <Box sx={{ minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
@@ -121,9 +176,8 @@ function StarPower() {
                                 value={seasonRange}
                                 onChange={handleSeasonChange}
                                 valueLabelDisplay="auto"
-                                min={4}
-                                max={24}
-                                valueLabelFormat={(value) => `20${value.toString().padStart(2, '0')}`}
+                                min={2004}
+                                max={2024}
                                 sx={{
                                     color: '#3F4C64',
                                     '& .MuiSlider-thumb': {
@@ -230,6 +284,17 @@ function StarPower() {
                             <MenuItem value="">
                                 <em>Select a team...</em>
                             </MenuItem>
+                            {teams.length > 0 ? (
+                                teams.map((team) => (
+                                    <MenuItem key={team.teamId} value={team.teamId}>
+                                        {team.school}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>
+                                    <em>Loading teams...</em>
+                                </MenuItem>
+                            )}
                         </Select>
                     </Box>
 
@@ -253,6 +318,17 @@ function StarPower() {
                             <MenuItem value="">
                                 <em>Select a conference...</em>
                             </MenuItem>
+                            {conferences.length > 0 ? (
+                                conferences.map((conference) => (
+                                    <MenuItem key={conference.conferenceId} value={conference.conferenceId}>
+                                        {conference.name}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>
+                                    <em>Loading conferences...</em>
+                                </MenuItem>
+                            )}
                         </Select>
                     </Box>
 
@@ -297,12 +373,22 @@ function StarPower() {
                         backgroundColor: 'white'
                     }}
                 >
-                    {!visualizationData ? (
+                    {!visualizationData.length ? (
                         <Typography color="text.secondary">
                             Select options and generate visualization
                         </Typography>
                     ) : (
-                        <Box>Visualization will go here</Box>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={visualizationData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="season" />
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
+                                <Bar dataKey="rank" fill="#8884d8" />
+                                <Bar dataKey="overallPick" fill="#82ca9d" />
+                            </BarChart>
+                        </ResponsiveContainer>
                     )}
                 </Paper>
             </Container>

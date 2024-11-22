@@ -1,11 +1,33 @@
 import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper } from '@mui/material';
 import Header from '../components/Header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function DraftDayDividends() {
-    const [seasonRange, setSeasonRange] = useState([4, 24]);
+    const [seasonRange, setSeasonRange] = useState([2004, 2024]);
     const [selectedPosition, setSelectedPosition] = useState('');
+    const [positions, setPositions] = useState([]);
     const [visualizationData, setVisualizationData] = useState(null);
+
+    useEffect(() => {
+        fetchPositions();
+    }, []);
+
+    const fetchPositions = async () => {
+        try {
+            const response = await fetch('/api/player-positions');
+            const data = await response.json();
+            console.log('Positions fetched:', data);
+            if (Array.isArray(data)) {
+                setPositions(data);
+            } else {
+                console.warn('Unexpected positions response format', data);
+                setPositions([]);
+            }
+        } catch (error) {
+            console.error('Error fetching positions:', error);
+            setPositions([]);
+        }
+    };
 
     const handleSeasonChange = (event, newValue) => {
         setSeasonRange(newValue);
@@ -16,7 +38,7 @@ function DraftDayDividends() {
     };
 
     const handleReset = () => {
-        setSeasonRange([4, 24]);
+        setSeasonRange([2004, 2024]);
         setSelectedPosition('');
         setVisualizationData(null);
     };
@@ -106,9 +128,9 @@ function DraftDayDividends() {
                                 value={seasonRange}
                                 onChange={handleSeasonChange}
                                 valueLabelDisplay="auto"
-                                min={4}
-                                max={24}
-                                valueLabelFormat={(value) => `20${value.toString().padStart(2, '0')}`}
+                                min={2004}
+                                max={2024}
+                                valueLabelFormat={(value) => `${value}`}
                                 sx={{
                                     color: '#3F4C64',
                                     '& .MuiSlider-thumb': {
@@ -173,6 +195,17 @@ function DraftDayDividends() {
                             <MenuItem value="">
                                 <em>Select a position...</em>
                             </MenuItem>
+                            {positions.length > 0 ? (
+                                positions.map((position) => (
+                                    <MenuItem key={position.position} value={position.position}>
+                                        {position.position}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>
+                                    <em>Loading positions...</em>
+                                </MenuItem>
+                            )}
                         </Select>
                     </Box>
 

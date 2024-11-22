@@ -1,12 +1,53 @@
 import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper } from '@mui/material';
 import Header from '../components/Header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function GameChangers() {
-    const [seasonRange, setSeasonRange] = useState([4, 24]);
+    const [seasonRange, setSeasonRange] = useState([2004, 2024]);
     const [selectedPlayer, setSelectedPlayer] = useState('');
     const [selectedTeam, setSelectedTeam] = useState('');
+    const [players, setPlayers] = useState([]);
+    const [teams, setTeams] = useState([]);
     const [visualizationData, setVisualizationData] = useState(null);
+
+    useEffect(() => {
+        fetchPlayers();
+        fetchTeams();
+    }, []);
+
+    const fetchPlayers = async () => {
+        try {
+            const response = await fetch('/api/players');
+            const data = await response.json();
+            console.log('Players fetched:', data);
+            if (Array.isArray(data)) {
+                setPlayers(data);
+            } else {
+                console.warn('Unexpected players response format', data);
+                setPlayers([]);
+            }
+        } catch (error) {
+            console.error('Error fetching players:', error);
+            setPlayers([]);
+        }
+    };
+
+    const fetchTeams = async () => {
+        try {
+            const response = await fetch('/api/teams');
+            const data = await response.json();
+            console.log('Teams fetched:', data);
+            if (Array.isArray(data)) {
+                setTeams(data);
+            } else {
+                console.warn('Unexpected teams response format', data);
+                setTeams([]);
+            }
+        } catch (error) {
+            console.error('Error fetching teams:', error);
+            setTeams([]);
+        }
+    };
 
     const handleSeasonChange = (event, newValue) => {
         setSeasonRange(newValue);
@@ -21,7 +62,7 @@ function GameChangers() {
     };
 
     const handleReset = () => {
-        setSeasonRange([4, 24]);
+        setSeasonRange([2004, 2024]);
         setSelectedPlayer('');
         setSelectedTeam('');
         setVisualizationData(null);
@@ -114,9 +155,9 @@ function GameChangers() {
                                 value={seasonRange}
                                 onChange={handleSeasonChange}
                                 valueLabelDisplay="auto"
-                                min={4}
-                                max={24}
-                                valueLabelFormat={(value) => `20${value.toString().padStart(2, '0')}`}
+                                min={2004}
+                                max={2024}
+                                valueLabelFormat={(value) => `${value}`}
                                 sx={{
                                     color: '#3F4C64',
                                     '& .MuiSlider-thumb': {
@@ -181,6 +222,17 @@ function GameChangers() {
                             <MenuItem value="">
                                 <em>Select a player...</em>
                             </MenuItem>
+                            {players.length > 0 ? (
+                                players.map((player) => (
+                                    <MenuItem key={player.playerId} value={player.playerId}>
+                                        {player.name}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>
+                                    <em>Loading players...</em>
+                                </MenuItem>
+                            )}
                         </Select>
                     </Box>
 
@@ -198,6 +250,17 @@ function GameChangers() {
                             <MenuItem value="">
                                 <em>Select a team...</em>
                             </MenuItem>
+                            {teams.length > 0 ? (
+                                teams.map((team) => (
+                                    <MenuItem key={team.teamId} value={team.teamId}>
+                                        {team.school}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>
+                                    <em>Loading teams...</em>
+                                </MenuItem>
+                            )}
                         </Select>
                     </Box>
 

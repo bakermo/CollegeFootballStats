@@ -31,4 +31,40 @@ namespace CollegeFootballStats.Core.Models
         public string Classification { get; set; } = string.Empty;
         public string Abbreviation { get; set; } = string.Empty;
     }
+    public class TeamRecruitingAndDraftResult
+    {
+        public string TeamName { get; set; }
+        public int DraftYear { get; set; }
+        public int DraftRound { get; set; }
+        public int DraftRoundPick { get; set; }
+        public int DraftOverallPick { get; set; }
+        public string PlayerPosition { get; set; }
+        public string PlayerFirstName { get; set; }
+        public string PlayerLastName { get; set; }
+        public string PlayerName => $"{PlayerFirstName} {PlayerLastName}";
+        public int PlayerSeason { get; set; }
+        public double? PlayerStatValue { get; set; }
+        public string TeamRankPoll { get; set; }
+        public int TeamRank { get; set; }
+        public int TeamRankSeason { get; set; }
+    }
+
+    public class TeamDraftPerformance
+    {
+        public int TeamId { get; set; }
+        public int Season { get; set; }
+        public int Rank { get; set; }
+        public int OverallPick { get; set; }
+    }
+    public class Coach
+    {
+        public int CoachID { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+    }
+
+    public class PlayerPosition
+    {
+        public string Position { get; set; } = string.Empty;
+    }
 }

@@ -16,4 +16,5 @@
         public int TeamGameStats { get; set; }
         public int TotalTuples { get; set; }
     }
+
 }
