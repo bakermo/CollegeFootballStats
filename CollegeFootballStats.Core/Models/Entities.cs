@@ -31,6 +31,18 @@ namespace CollegeFootballStats.Core.Models
         public string Classification { get; set; } = string.Empty;
         public string Abbreviation { get; set; } = string.Empty;
     }
+
+    public class StatCategory
+    {
+        public int Id { get; set; }
+        public string Category { get; set; } = string.Empty;
+    }
+
+    public class StatType
+    {
+        public int Id { get; set; }
+        public string Type { get; set; } = string.Empty;
+    }
     public class TeamRecruitingAndDraftResult
     {
         public string TeamName { get; set; }

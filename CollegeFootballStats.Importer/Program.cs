@@ -90,6 +90,9 @@ while (actionChoice != (int)ImporterAction.Exit)
                 case ImportType.PlayerSeasonStats:
                     importer = new PlayerSeasonStatsImporter(importerConfig, importerLogger);
                     break;
+                case ImportType.PlayerGameStats:
+                    importer = new PlayerGameStatsImporter(importerConfig, importerLogger);
+                    break;
                 case ImportType.Polls:
                     importer = new PollsImporter(importerConfig, importerLogger);
                     break;
@@ -186,6 +189,7 @@ public enum ImportType
     Games,
     PlayersAndRosters,
     PlayerSeasonStats,
+    PlayerGameStats,
     Polls,
     Teams,
     TeamGameStats,

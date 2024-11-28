@@ -1,4 +1,5 @@
 ﻿
+using CollegeFootballStats.Core.Models;
 using CollegeFootballStats.Core.Queries;
 using Microsoft.Extensions.Logging;
 using System.Data;
@@ -28,6 +29,8 @@ namespace CollegeFootballStats.Importer
                 return;
             }
 
+            var statCategories = await GetStatCategories();
+
             long teamGameStatsImported = 0;
             try
             {
@@ -35,7 +38,7 @@ namespace CollegeFootballStats.Importer
                 var dataTable = new DataTable("TEAMGAMESTAT");
                 //dataTable.Columns.Add("STATID", typeof(int));
                 dataTable.Columns.Add("STATVALUE", typeof(decimal));
-                dataTable.Columns.Add("STATCATEGORY", typeof(string));
+                dataTable.Columns.Add("STATCATEGORY", typeof(int));
                 dataTable.Columns.Add("GAME", typeof(int));
                 dataTable.Columns.Add("TEAM", typeof(int));
 
@@ -75,10 +78,21 @@ namespace CollegeFootballStats.Importer
                                         seasonStatsImported++;
                                         teamGameStatsImported++;
 
+                                        int categoryId = 0;
+                                        if (statCategories.ContainsKey(stat.Category))
+                                        {
+                                            categoryId = statCategories[stat.Category];
+                                        }
+                                        else
+                                        {
+                                            categoryId = await _sqlCommandManager.InsertAndGetIdAsync<int>(new InsertStatCategory(stat.Category));
+                                            statCategories.Add(stat.Category, categoryId);
+                                        }
+
                                         dataTable.Rows.Add(
                                             //null, 
                                             statValue,
-                                            stat.Category,
+                                            categoryId,
                                             game.Id,
                                             team.SchoolId);
                                     }
