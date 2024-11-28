@@ -42,7 +42,7 @@ namespace CollegeFootballStats.Core
         /// <param name="command">The SQL command containing the INSERT statement with a RETURNING clause.</param>
         /// <param name="idParameterName">The name of the output parameter for the ID.</param>
         /// <returns>The generated ID.</returns>
-        public async Task<int> InsertAndGetIdAsync<T>(ISqlCommand command, string idParameterName)
+        public async Task<int> InsertAndGetIdAsync<T>(ISqlCommand command, string idParameterName = "ID")
         {
             using var conn = new OracleConnection(_connectionString);
 
