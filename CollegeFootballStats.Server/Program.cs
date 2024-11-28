@@ -78,10 +78,28 @@ app.MapGet("/tuples", async (SqlCommandManager queryManager) => {
     response.Games = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("GAME"));
     response.Rosters = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("ROSTER"));
     response.Players = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("PLAYER"));
-    response.Polls = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("POLL"));
+    response.PlayerGameStats = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("PLAYERGAMESTAT"));
     response.PlayerSeasonStats = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("PLAYERSEASONSTAT"));
+    response.Polls = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("POLL"));
+    response.StatCategories = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("STATCATEGORY"));
+    response.StatTypes = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("STATTYPE"));
     response.TeamGameStats = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("TEAMGAMESTAT"));
-    response.TotalTuples = response.Teams + response.Coaches + response.CoachingRecords + response.Conferences + response.ConferenceMemberships + response.DraftPicks + response.Games + response.Rosters + response.Players + response.Polls + response.PlayerSeasonStats + response.TeamGameStats;
+    response.TotalTuples = 
+        response.Teams + 
+        response.Coaches + 
+        response.CoachingRecords + 
+        response.Conferences + 
+        response.ConferenceMemberships + 
+        response.DraftPicks + 
+        response.Games + 
+        response.Rosters + 
+        response.Players + 
+        response.PlayerGameStats +
+        response.PlayerSeasonStats +
+        response.Polls +
+        response.StatCategories +
+        response.StatTypes +
+        response.TeamGameStats;
 
     return Results.Ok(response);
 });

@@ -10,8 +10,11 @@
         public int Games { get; set; }
         public int Rosters { get; set; }
         public int Players { get; set; }
-        public int Polls { get; set; }
+        public int PlayerGameStats { get; set; }
         public int PlayerSeasonStats { get; set; }
+        public int Polls { get; set; }
+        public int StatCategories { get; set; }
+        public int StatTypes { get; set; }
         public int Teams { get; set; }
         public int TeamGameStats { get; set; }
         public int TotalTuples { get; set; }
