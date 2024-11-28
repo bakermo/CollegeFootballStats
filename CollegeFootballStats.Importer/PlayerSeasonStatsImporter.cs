@@ -25,6 +25,10 @@ namespace CollegeFootballStats.Importer
             }
 
             _logger.LogInformation($"Found {players.Count} players in database");
+
+            var statTypes = await GetStatTypes();
+            var statCategories = await GetStatCategories();
+
             long playerStatsImported = 0;
             try
             {
@@ -34,8 +38,8 @@ namespace CollegeFootballStats.Importer
                 var dataTable = new DataTable("PLAYERSEASONSTAT");
                 //dataTable.Columns.Add("STATID", typeof(int));
                 dataTable.Columns.Add("STATVALUE", typeof(decimal));
-                dataTable.Columns.Add("STATTYPE", typeof(string));
-                dataTable.Columns.Add("STATCATEGORY", typeof(string));
+                dataTable.Columns.Add("STATTYPE", typeof(int));
+                dataTable.Columns.Add("STATCATEGORY", typeof(int));
                 dataTable.Columns.Add("SEASON", typeof(int));
                 dataTable.Columns.Add("PLAYER", typeof(int));
 
@@ -58,11 +62,33 @@ namespace CollegeFootballStats.Importer
                             seasonStatsImported++;
                             playerStatsImported++;
 
+                            int statTypeId = 0;
+                            int categoryId = 0;
+                            if (statTypes.ContainsKey(stat.StatType))
+                            {
+                                statTypeId = statTypes[stat.StatType];
+                            }
+                            else
+                            {
+                                statTypeId = await _sqlCommandManager.InsertAndGetIdAsync<int>(new InsertStatType(stat.StatType));
+                                statTypes.Add(stat.StatType, statTypeId);
+                            }
+
+                            if (statCategories.ContainsKey(stat.Category))
+                            {
+                                categoryId = statCategories[stat.Category];
+                            }
+                            else
+                            {
+                                categoryId = await _sqlCommandManager.InsertAndGetIdAsync<int>(new InsertStatCategory(stat.Category));
+                                statCategories.Add(stat.Category, categoryId);
+                            }
+
                             dataTable.Rows.Add(
                                 //null, 
                                 statValue,
-                                stat.StatType,
-                                stat.Category,
+                                statTypeId,
+                                categoryId,
                                 season,
                                 stat.PlayerId.GetValueOrDefault());
                         }

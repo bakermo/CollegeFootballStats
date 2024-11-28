@@ -87,5 +87,17 @@ namespace CollegeFootballStats.Importer
             var result = await _sqlCommandManager.QueryFirstOrDefault<int>(new CountTuplesByTable(tableName));
             return result > 0;
         }
+
+        protected async Task<Dictionary<string, int>> GetStatTypes()
+        {
+            var statTypes = await _sqlCommandManager.QueryAsync<StatType>(new GetStatTypes());
+            return statTypes.ToDictionary(s => s.Type, s => s.Id);
+        }
+
+        protected async Task<Dictionary<string, int>> GetStatCategories()
+        {
+            var statCategories = await _sqlCommandManager.QueryAsync<StatCategory>(new GetStatCategories());
+            return statCategories.ToDictionary(s => s.Category, s => s.Id);
+        }
     }
 }
