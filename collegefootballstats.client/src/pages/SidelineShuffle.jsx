@@ -17,7 +17,7 @@ function SidelineShuffle() {
 
     const fetchTeams = async () => {
         try {
-            const response = await fetch('/teams');
+            const response = await fetch('/api/teams');
             const data = await response.json();
             console.log('Teams fetched:', data);
             if (Array.isArray(data)) {
@@ -34,7 +34,7 @@ function SidelineShuffle() {
 
     const fetchCoaches = async () => {
         try {
-            const response = await fetch('/coaches');
+            const response = await fetch('/api/coaches');
             const data = await response.json();
             console.log('Coaches fetched:', data);
             if (Array.isArray(data)) {

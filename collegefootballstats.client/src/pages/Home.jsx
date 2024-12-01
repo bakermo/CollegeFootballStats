@@ -41,7 +41,7 @@ function Home() {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get('/tuples');
+            const response = await axios.get('/api/tuples');
             console.log(response.data);
             if (response && response.data) {
                 setTupleCount(response.data.totalTuples);

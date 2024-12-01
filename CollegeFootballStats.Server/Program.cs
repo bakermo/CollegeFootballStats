@@ -85,40 +85,37 @@ app.MapGet("/teams/draft-performance", async (SqlCommandManager queryManager, in
 
 
 app.MapGet("/tuples", async (SqlCommandManager queryManager) => {
-    // yes. This is inefficient. Yes. there is a better way to do this in one query
-    // but right now im tired and don't care
+    var tableNames = new[]
+    {
+        "TEAM", "COACH", "COACHINGRECORD", "CONFERENCE", "CONFERENCEMEMBERSHIP",
+        "DRAFTPICK", "GAME", "ROSTER", "PLAYER", "PLAYERGAMESTAT",
+        "PLAYERSEASONSTAT", "POLL", "STATCATEGORY", "STATTYPE", "TEAMGAMESTAT"
+    };
+
     var response = new TupleCount();
-    response.Teams = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("TEAM"));
-    response.Coaches = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("COACH"));
-    response.CoachingRecords = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("COACHINGRECORD"));
-    response.Conferences = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("CONFERENCE"));
-    response.ConferenceMemberships = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("CONFERENCEMEMBERSHIP"));
-    response.DraftPicks = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("DRAFTPICK"));
-    response.Games = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("GAME"));
-    response.Rosters = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("ROSTER"));
-    response.Players = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("PLAYER"));
-    response.PlayerGameStats = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("PLAYERGAMESTAT"));
-    response.PlayerSeasonStats = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("PLAYERSEASONSTAT"));
-    response.Polls = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("POLL"));
-    response.StatCategories = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("STATCATEGORY"));
-    response.StatTypes = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("STATTYPE"));
-    response.TeamGameStats = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("TEAMGAMESTAT"));
-    response.TotalTuples = 
-        response.Teams + 
-        response.Coaches + 
-        response.CoachingRecords + 
-        response.Conferences + 
-        response.ConferenceMemberships + 
-        response.DraftPicks + 
-        response.Games + 
-        response.Rosters + 
-        response.Players + 
-        response.PlayerGameStats +
-        response.PlayerSeasonStats +
-        response.Polls +
-        response.StatCategories +
-        response.StatTypes +
-        response.TeamGameStats;
+    var tasks = tableNames.Select(async tableName =>
+        await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable(tableName))
+    ).ToArray();
+
+    var results = await Task.WhenAll(tasks);
+
+    response.Teams = results[0];
+    response.Coaches = results[1];
+    response.CoachingRecords = results[2];
+    response.Conferences = results[3];
+    response.ConferenceMemberships = results[4];
+    response.DraftPicks = results[5];
+    response.Games = results[6];
+    response.Rosters = results[7];
+    response.Players = results[8];
+    response.PlayerGameStats = results[9];
+    response.PlayerSeasonStats = results[10];
+    response.Polls = results[11];
+    response.StatCategories = results[12];
+    response.StatTypes = results[13];
+    response.TeamGameStats = results[14];
+
+    response.TotalTuples = results.Sum();
 
     return Results.Ok(response);
 });
