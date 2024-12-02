@@ -12,8 +12,11 @@ function SidelineShuffle() {
 
     useEffect(() => {
         fetchTeams();
-        fetchCoaches();
     }, []);
+
+    useEffect(() => {
+        fetchCoaches();
+    }, [selectedTeam]);
 
     const fetchTeams = async () => {
         try {
@@ -34,7 +37,7 @@ function SidelineShuffle() {
 
     const fetchCoaches = async () => {
         try {
-            const response = await fetch('/api/coaches');
+            const response = await fetch(`/api/coaches/${selectedTeam}`);
             const data = await response.json();
             console.log('Coaches fetched:', data);
             if (Array.isArray(data)) {
@@ -54,11 +57,17 @@ function SidelineShuffle() {
     };
 
     const handleTeamChange = (event) => {
+        console.log(teams);
+        console.log(selectedTeam);
         setSelectedTeam(event.target.value);
+        console.log(selectedTeam);
     };
 
     const handleCoachChange = (event) => {
+        console.log(coaches);
+        console.log(selectedCoach);
         setSelectedCoach(event.target.value);
+        console.log(selectedCoach);
     };
 
     const handleReset = () => {
@@ -251,7 +260,7 @@ function SidelineShuffle() {
                             </MenuItem>
                             {coaches.length > 0 ? (
                                 coaches.map((coach) => (
-                                    <MenuItem key={coach.coachId} value={coach.coachId}>
+                                    <MenuItem key={coach.coachID} value={coach.coachID}>
                                         {`${coach.firstName} ${coach.lastName}`}
                                     </MenuItem>
                                 ))

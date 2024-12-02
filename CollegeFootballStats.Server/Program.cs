@@ -145,6 +145,23 @@ app.MapGet("/coaches", async (SqlCommandManager queryManager) =>
     return Results.Ok(coaches.ToList());
 });
 
+app.MapGet("/coaches/{teamID}", async (SqlCommandManager queryManager, int teamID) =>
+{
+    ISqlCommand query = new GetCoachesByTeam(teamID);
+    var coaches = await queryManager
+        .QueryAsync<Coach>(query);
+
+    return Results.Ok(coaches.ToList());
+});
+
+
+app.MapGet("/coaching-impact", async (SqlCommandManager queryManager, string teamId, string coachId, string startYear, string endYear) =>
+{
+    ISqlCommand query = new CoachingImpact(teamId, coachId, startYear, endYear);
+    var result = await queryManager.QueryAsync<CoachingImpactResult>(query);
+    return Results.Ok(result);
+});
+
 app.MapGet("/player-positions", async (SqlCommandManager queryManager) =>
 {
     var query = new GetAllPlayerPositions();

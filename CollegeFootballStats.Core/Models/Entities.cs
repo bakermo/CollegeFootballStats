@@ -75,6 +75,19 @@ namespace CollegeFootballStats.Core.Models
         public string LastName { get; set; } = string.Empty;
     }
 
+    public class CoachingImpactResult
+    {
+        public int CoachID { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string School { get; set; } = string.Empty;
+        public int Year { get; set; }
+        public decimal WinPercentage { get; set; }
+        public int APRank { get; set; }
+        public int CoachesPollRank { get; set; }
+        public int PlayerCommitterRank { get; set; }
+    }
+
     public class PlayerPosition
     {
         public string Position { get; set; } = string.Empty;
