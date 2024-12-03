@@ -1,6 +1,8 @@
 import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper } from '@mui/material';
 import Header from '../components/Header';
 import { useState, useEffect } from 'react';
+import CoachingImpactVisualization from '../components/CoachingImpactVisualization';
+
 
 function SidelineShuffle() {
     const [seasonRange, setSeasonRange] = useState([2004, 2024]);
@@ -12,8 +14,11 @@ function SidelineShuffle() {
 
     useEffect(() => {
         fetchTeams();
-        fetchCoaches();
     }, []);
+
+    useEffect(() => {
+        fetchCoaches();
+    }, [selectedTeam]);
 
     const fetchTeams = async () => {
         try {
@@ -34,7 +39,7 @@ function SidelineShuffle() {
 
     const fetchCoaches = async () => {
         try {
-            const response = await fetch('/api/coaches');
+            const response = await fetch(`/api/coaches/${selectedTeam}`);
             const data = await response.json();
             console.log('Coaches fetched:', data);
             if (Array.isArray(data)) {
@@ -54,11 +59,17 @@ function SidelineShuffle() {
     };
 
     const handleTeamChange = (event) => {
+        console.log(teams);
+        console.log(selectedTeam);
         setSelectedTeam(event.target.value);
+        console.log(selectedTeam);
     };
 
     const handleCoachChange = (event) => {
+        console.log(coaches);
+        console.log(selectedCoach);
         setSelectedCoach(event.target.value);
+        console.log(selectedCoach);
     };
 
     const handleReset = () => {
@@ -68,12 +79,24 @@ function SidelineShuffle() {
         setVisualizationData(null);
     };
 
-    const generateVisualization = () => {
+    const generateVisualization = async () => {
         console.log('Generating visualization with:', {
             seasonRange,
             team: selectedTeam,
             coach: selectedCoach
         });
+
+        try {
+            console.log(seasonRange);
+            const response = await fetch(`/api/coaching-impact?teamId=${selectedTeam}&coachId=${selectedCoach}&startYear=${seasonRange[0]}&endYear=${seasonRange[1]}`);
+            console.log(response);
+            const data = await response.json();
+            console.log('data fetched:', data);
+            setVisualizationData(data);
+        } catch (error) {
+            console.error('Error fetching visualization data:', error);
+        }
+
     };
 
     return (
@@ -251,7 +274,7 @@ function SidelineShuffle() {
                             </MenuItem>
                             {coaches.length > 0 ? (
                                 coaches.map((coach) => (
-                                    <MenuItem key={coach.coachId} value={coach.coachId}>
+                                    <MenuItem key={coach.coachID} value={coach.coachID}>
                                         {`${coach.firstName} ${coach.lastName}`}
                                     </MenuItem>
                                 ))
@@ -309,7 +332,7 @@ function SidelineShuffle() {
                             Select a team and coach, then generate visualization
                         </Typography>
                     ) : (
-                        <Box>Visualization will go here</Box>
+                        <CoachingImpactVisualization data={visualizationData} />
                     )}
                 </Paper>
             </Container>
