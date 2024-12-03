@@ -1,6 +1,8 @@
 import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper } from '@mui/material';
 import Header from '../components/Header';
 import { useState, useEffect } from 'react';
+import CoachingImpactVisualization from '../components/CoachingImpactVisualization';
+
 
 function SidelineShuffle() {
     const [seasonRange, setSeasonRange] = useState([2004, 2024]);
@@ -77,12 +79,24 @@ function SidelineShuffle() {
         setVisualizationData(null);
     };
 
-    const generateVisualization = () => {
+    const generateVisualization = async () => {
         console.log('Generating visualization with:', {
             seasonRange,
             team: selectedTeam,
             coach: selectedCoach
         });
+
+        try {
+            console.log(seasonRange);
+            const response = await fetch(`/api/coaching-impact?teamId=${selectedTeam}&coachId=${selectedCoach}&startYear=${seasonRange[0]}&endYear=${seasonRange[1]}`);
+            console.log(response);
+            const data = await response.json();
+            console.log('data fetched:', data);
+            setVisualizationData(data);
+        } catch (error) {
+            console.error('Error fetching visualization data:', error);
+        }
+
     };
 
     return (
@@ -318,7 +332,7 @@ function SidelineShuffle() {
                             Select a team and coach, then generate visualization
                         </Typography>
                     ) : (
-                        <Box>Visualization will go here</Box>
+                        <CoachingImpactVisualization data={visualizationData} />
                     )}
                 </Paper>
             </Container>
