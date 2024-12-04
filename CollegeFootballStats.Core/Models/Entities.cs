@@ -88,6 +88,25 @@ namespace CollegeFootballStats.Core.Models
         public int PlayerCommitterRank { get; set; }
     }
 
+    public class PlayerImpactResult
+    {
+        public int PlayerID { get; set; }
+        public int GameID { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Position { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public int StatValue { get; set; }
+        public int Season { get; set; }
+        public decimal WinPercentage { get; set; }
+        public int Week { get; set; }
+        public int isPostSeason { get; set; }
+        public int APTop25Rank { get; set; }
+        public int CoachesPollRank { get; set; }
+        public int PlayoffCommitteeRank { get; set; }
+    }
+
     public class PlayerPosition
     {
         public string Position { get; set; } = string.Empty;

@@ -130,6 +130,14 @@ app.MapGet("/players", async (SqlCommandManager queryManager) =>
     return Results.Ok(players.ToList());
 });
 
+app.MapGet("/players/impact", async (SqlCommandManager queryManager, string teamID, string playerID, string startYear, string endYear, string statType, 
+    string statCategory, string compOperator, int compValue) =>
+{
+    ISqlCommand query = new PlayerImpact(teamID, playerID, startYear, endYear, statType, statCategory, compOperator, compValue);
+    var result = await queryManager.QueryAsync<PlayerImpactResult>(query);
+    return Results.Ok(result);
+});
+
 app.MapGet("/conferences", async (SqlCommandManager queryManager) =>
 {
     ISqlCommand query = new GetAllConferences();
