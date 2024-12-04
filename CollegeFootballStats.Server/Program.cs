@@ -6,6 +6,9 @@ using CollegeFootballStats.Server;
 using Oracle.ManagedDataAccess.Client;
 using System.Data.SqlClient;
 using System.Data;
+using Microsoft.AspNetCore.Mvc;
+using CollegeFootballStats.Core.Models;
+using CollegeFootballStats.Core.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -167,6 +170,68 @@ app.MapGet("/player-positions", async (SqlCommandManager queryManager) =>
     var query = new GetAllPlayerPositions();
     var result = await queryManager.QueryAsync<PlayerPosition>(query);
     return Results.Ok(result);
+});
+
+// For the ConferenceClash page woo
+app.MapGet("/conference-evolution", async (
+    SqlCommandManager queryManager,
+    [FromQuery] int conferenceId,
+    [FromQuery] int? teamId,
+    [FromQuery] int startYear,
+    [FromQuery] int endYear) =>
+{
+    try
+    {
+        var query = new GetConferenceEvolution(conferenceId, teamId, startYear, endYear);
+        var result = await queryManager.QueryAsync<ConferenceEvolutionResult>(query);
+
+        if (!result.Any())
+        {
+            return Results.NotFound("No data found for the specified parameters");
+        }
+
+        return Results.Ok(result);
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"Error in conference-evolution endpoint: {ex}");
+        return Results.Problem("Error fetching conference evolution data");
+    }
+})
+.WithName("GetConferenceEvolution")
+.WithOpenApi(operation =>
+{
+    operation.Summary = "Get conference offensive/defensive performance evolution";
+    operation.Description = "Retrieves points scored and allowed per game over time for a conference or specific team";
+    return operation;
+});
+
+app.MapGet("/teams/conference/{conferenceId}", async (SqlCommandManager queryManager, int conferenceId) =>
+{
+    try
+    {
+        var query = new GetTeamsByConference(conferenceId);
+        var teams = await queryManager.QueryAsync<Team>(query);
+
+        if (!teams.Any())
+        {
+            return Results.NotFound($"No teams found for conference ID: {conferenceId}");
+        }
+
+        return Results.Ok(teams);
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"Error fetching teams by conference: {ex}");
+        return Results.Problem("Error fetching teams");
+    }
+})
+.WithName("GetTeamsByConference")
+.WithOpenApi(operation =>
+{
+    operation.Summary = "Get teams by conference";
+    operation.Description = "Returns all teams currently in the specified conference";
+    return operation;
 });
 
 app.MapFallbackToFile("/index.html");
