@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper } from '@mui/material';
+import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper, Autocomplete, TextField } from '@mui/material';
 import Header from '../components/Header';
 import { useState, useEffect } from 'react';
 
@@ -7,17 +7,27 @@ function GameChangers() {
     const [selectedPlayer, setSelectedPlayer] = useState('');
     const [selectedTeam, setSelectedTeam] = useState('');
     const [players, setPlayers] = useState([]);
+    const [selectedPlayerType, setSelectedPlayerType] = useState('');
     const [teams, setTeams] = useState([]);
     const [visualizationData, setVisualizationData] = useState(null);
+    const [playerSearch, setPlayerSearch] = useState('');
 
     useEffect(() => {
-        fetchPlayers();
         fetchTeams();
     }, []);
 
-    const fetchPlayers = async () => {
+    useEffect(() => {
+        if (playerSearch) {
+            fetchPlayers(playerSearch);
+        } else {
+            setPlayers([]);
+        }
+    }, [playerSearch]);
+
+    const fetchPlayers = async (search) => {
         try {
-            const response = await fetch('/api/players');
+            const response = await fetch(`/api/players/${search}`);
+            console.log(response.data);
             const data = await response.json();
             console.log('Players fetched:', data);
             if (Array.isArray(data)) {
@@ -53,8 +63,15 @@ function GameChangers() {
         setSeasonRange(newValue);
     };
 
-    const handlePlayerChange = (event) => {
-        setSelectedPlayer(event.target.value);
+    const handlePlayerChange = (event, newValue) => {
+        console.log("newValue: ", newValue);
+        setSelectedPlayer(newValue ? newValue.playerID : '');
+        console.log("selectedPlayer: ", selectedPlayer);
+    };
+
+    const handlePlayerType = (event, newValue) => {
+        console.log("newValue: ", newValue);
+        setSelectedPlayerType(newValue ? newValue : '');
     };
 
     const handleTeamChange = (event) => {
@@ -66,6 +83,7 @@ function GameChangers() {
         setSelectedPlayer('');
         setSelectedTeam('');
         setVisualizationData(null);
+        setPlayerSearch('');
     };
 
     const generateVisualization = () => {
@@ -210,32 +228,37 @@ function GameChangers() {
 
                     <Box sx={{ mb: 3 }}>
                         <Typography sx={{ mb: 1, color: '#212D40' }}>
-                            Select Player
+                            Search Player
                         </Typography>
-                        <Select
-                            fullWidth
-                            value={selectedPlayer}
+                        <Autocomplete
+                            options={players}
+                            getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+                            isOptionEqualToValue={(option, value) => option.playerID === value.playerID}
+                            onInputChange={(event, newInputValue) => {
+                                setPlayerSearch(newInputValue);
+                            }}
                             onChange={handlePlayerChange}
-                            displayEmpty
-                            sx={{ backgroundColor: 'white' }}
-                        >
-                            <MenuItem value="">
-                                <em>Select a player...</em>
-                            </MenuItem>
-                            {players.length > 0 ? (
-                                players.map((player) => (
-                                    <MenuItem key={player.playerId} value={player.playerId}>
-                                        {player.name}
-                                    </MenuItem>
-                                ))
-                            ) : (
-                                <MenuItem disabled>
-                                    <em>Loading players...</em>
-                                </MenuItem>
+                            inputValue={playerSearch}
+                            renderOption={(props, option) => (
+                                <li {...props} key={option.playerID}>
+                                    {option.firstName} {option.lastName}
+                                </li>
                             )}
-                        </Select>
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    placeholder="Search for a player..."
+                                    fullWidth
+                                    sx={{ backgroundColor: 'white' }}
+                                />
+                            )}
+                        />
                     </Box>
-
+                    <Box sx={{ mb: 3, textAlign: 'center' }}>
+                        <Typography variant="h6" sx={{ color: '#212D40' }}>
+                            OR
+                        </Typography>
+                    </Box>
                     <Box sx={{ mb: 3 }}>
                         <Typography sx={{ mb: 1, color: '#212D40' }}>
                             Select Team
@@ -258,12 +281,41 @@ function GameChangers() {
                                 ))
                             ) : (
                                 <MenuItem disabled>
+                                    <em>Select a team first</em>
+                                </MenuItem>
+                            )}
+                        </Select>
+                    </Box>
+                    <Box sx={{ mb: 3 }}>
+                        <Typography sx={{ mb: 1, color: '#212D40' }}>
+                            Select Offensive/Defensive
+                        </Typography>
+                        <Select
+                            fullWidth
+                            value={selectedPlayerType}
+                            onChange={handlePlayerType}
+                            displayEmpty
+                            sx={{ backgroundColor: 'white' }}
+                        >
+                            <MenuItem value="">
+                                <em>Select a player type...</em>
+                            </MenuItem>
+                            {selectedTeam ? (
+                                <>
+                                    <MenuItem value="offensive">
+                                        Offensive
+                                    </MenuItem>
+                                    <MenuItem value="defensive">
+                                        Defensive
+                                    </MenuItem>
+                                </>
+                            ) : (
+                                <MenuItem disabled>
                                     <em>Loading teams...</em>
                                 </MenuItem>
                             )}
                         </Select>
                     </Box>
-
                     <Box sx={{ display: 'flex', gap: 2 }}>
                         <Button
                             variant="contained"
