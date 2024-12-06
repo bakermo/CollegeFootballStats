@@ -137,12 +137,33 @@ app.MapGet("/players/{search}", async (SqlCommandManager queryManager, string se
     return Results.Ok(result);
 });
 
+app.MapGet("/players/type", async (SqlCommandManager queryManager, [FromQuery] string teamID, [FromQuery] string name) =>
+{
+    ISqlCommand query = name switch
+    {
+        "offensive" => new GetPlayersOffensive(teamID),
+        "defensive" => new GetPlayersDefensive(teamID),
+        "specialTeams" => new GetPlayersSpecialTeams(teamID),
+        _ => throw new ArgumentException("Invalid player type", nameof(name))
+    };
 
-app.MapGet("/players/impact", async (SqlCommandManager queryManager, string teamID, string playerID, string startYear, string endYear, string statType, 
+    var result = await queryManager.QueryAsync<Player>(query);
+    return Results.Ok(result);
+});
+
+
+app.MapGet("/player-impact", async (SqlCommandManager queryManager, string teamID, string playerID, string startYear, string endYear, string statType, 
     string statCategory, string compOperator, int compValue) =>
 {
     ISqlCommand query = new PlayerImpact(teamID, playerID, startYear, endYear, statType, statCategory, compOperator, compValue);
     var result = await queryManager.QueryAsync<PlayerImpactResult>(query);
+    return Results.Ok(result);
+});
+
+app.MapGet("/statTypes", async (SqlCommandManager queryManager, [FromQuery] string playerID) =>
+{
+    ISqlCommand query = new GetPlayerStatTypes(playerID);
+    var result = await queryManager.QueryAsync<StatType>(query);
     return Results.Ok(result);
 });
 

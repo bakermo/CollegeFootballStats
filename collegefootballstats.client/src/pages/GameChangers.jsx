@@ -7,10 +7,15 @@ function GameChangers() {
     const [selectedPlayer, setSelectedPlayer] = useState('');
     const [selectedTeam, setSelectedTeam] = useState('');
     const [players, setPlayers] = useState([]);
+    const [playersByType, setPlayersByType] = useState([]);
     const [selectedPlayerType, setSelectedPlayerType] = useState('');
     const [teams, setTeams] = useState([]);
     const [visualizationData, setVisualizationData] = useState(null);
     const [playerSearch, setPlayerSearch] = useState('');
+    const [statTypes, setStatTypes] = useState([]);
+    const [selectedStatType, setSelectedStatType] = useState('');
+    const [comparisonOperator, setComparisonOperator] = useState('');
+    const [comparisonValue, setComparisonValue] = useState(null);
 
     useEffect(() => {
         fetchTeams();
@@ -23,6 +28,22 @@ function GameChangers() {
             setPlayers([]);
         }
     }, [playerSearch]);
+
+    useEffect(() => {
+        if (selectedPlayerType) {
+            fetchPlayersByType(selectedPlayerType);
+        } else {
+            setPlayersByType([]);
+        }
+    }, [selectedPlayerType]);
+
+    useEffect(() => {
+        if (selectedPlayer) {
+            fetchPlayerStatTypes(selectedPlayer);
+        } else {
+            setStatTypes([]);
+        }
+    }, [selectedPlayer]);
 
     const fetchPlayers = async (search) => {
         try {
@@ -39,6 +60,42 @@ function GameChangers() {
         } catch (error) {
             console.error('Error fetching players:', error);
             setPlayers([]);
+        }
+    };
+
+    const fetchPlayersByType = async () => {
+        try {
+            const response = await fetch(`/api/players/type?name=${selectedPlayerType}&teamID=${selectedTeam}`);
+            console.log(response.data);
+            const data = await response.json();
+            console.log('Players fetched:', data);
+            if (Array.isArray(data)) {
+                setPlayersByType(data);
+            } else {
+                console.warn('Unexpected players response format', data);
+                setPlayersByType([]);
+            }
+        } catch (error) {
+            console.error('Error fetching players:', error);
+            setPlayersByType([]);
+        }
+    };
+
+    const fetchPlayerStatTypes = async () => {
+        try {
+            const response = await fetch(`/api/statTypes?playerID=${selectedPlayer}`);
+            console.log(response.data);
+            const data = await response.json();
+            console.log('stat types fetched:', data);
+            if (Array.isArray(data)) {
+                setStatTypes(data);
+            } else {
+                console.warn('Unexpected stat types response format', data);
+                setStatTypes([]);
+            }
+        } catch (error) {
+            console.error('Error fetching stat types:', error);
+            setStatTypes([]);
         }
     };
 
@@ -63,15 +120,34 @@ function GameChangers() {
         setSeasonRange(newValue);
     };
 
-    const handlePlayerChange = (event, newValue) => {
-        console.log("newValue: ", newValue);
-        setSelectedPlayer(newValue ? newValue.playerID : '');
+    const handlePlayerChange = (event) => {
+        console.log("newValue: ", event.target.value);
+        setSelectedPlayer(event.target.value);
         console.log("selectedPlayer: ", selectedPlayer);
     };
 
-    const handlePlayerType = (event, newValue) => {
+    const handlePlayerChangeSearch = (event, newValue) => {
         console.log("newValue: ", newValue);
-        setSelectedPlayerType(newValue ? newValue : '');
+        setSelectedPlayer(newValue.playerID);
+        console.log("selectedPlayer: ", selectedPlayer);
+    };
+
+    const handlePlayerType = (event) => {
+        console.log("newValue: ", event.target.value);
+        setSelectedPlayerType(event.target.value);
+        console.log("selectedPlayertype: ", selectedPlayerType);
+    };
+
+    const handleStatTypeChange = (event) => {
+        console.log("newValue: ", event.target.value);
+        setSelectedStatType(event.target.value);
+        console.log("selectedStattype: ", selectedStatType);
+    };
+
+    const handleCompOperator = (event) => {
+        console.log("newValue: ", event.target.value);
+        setComparisonOperator(event.target.value);
+        console.log("selectedcompop: ", comparisonOperator);
     };
 
     const handleTeamChange = (event) => {
@@ -86,13 +162,23 @@ function GameChangers() {
         setPlayerSearch('');
     };
 
-    const generateVisualization = () => {
-        // TODO: Add visualization generation logic
+    const generateVisualization = async () => {
         console.log('Generating visualization with:', {
             seasonRange,
-            selectedPlayer,
-            selectedTeam
+            player: selectedPlayer
         });
+
+        try {
+            console.log(seasonRange);
+            const response = await fetch('/api/player-impact', );
+            console.log(response);
+            const data = await response.json();
+            console.log('data fetched:', data);
+            setVisualizationData(data);
+        } catch (error) {
+            console.error('Error fetching visualization data:', error);
+        }
+
     };
 
     return (
@@ -234,11 +320,11 @@ function GameChangers() {
                             options={players}
                             getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                             isOptionEqualToValue={(option, value) => option.playerID === value.playerID}
+                            onChange={handlePlayerChangeSearch}
+                            inputValue={playerSearch}
                             onInputChange={(event, newInputValue) => {
                                 setPlayerSearch(newInputValue);
                             }}
-                            onChange={handlePlayerChange}
-                            inputValue={playerSearch}
                             renderOption={(props, option) => (
                                 <li {...props} key={option.playerID}>
                                     {option.firstName} {option.lastName}
@@ -281,14 +367,14 @@ function GameChangers() {
                                 ))
                             ) : (
                                 <MenuItem disabled>
-                                    <em>Select a team first</em>
+                                    <em>Loading teams...</em>
                                 </MenuItem>
                             )}
                         </Select>
                     </Box>
                     <Box sx={{ mb: 3 }}>
                         <Typography sx={{ mb: 1, color: '#212D40' }}>
-                            Select Offensive/Defensive
+                            Select Player Type
                         </Typography>
                         <Select
                             fullWidth
@@ -301,21 +387,100 @@ function GameChangers() {
                                 <em>Select a player type...</em>
                             </MenuItem>
                             {selectedTeam ? (
-                                <>
-                                    <MenuItem value="offensive">
+                                [
+                                    <MenuItem key="offensive" value="offensive">
                                         Offensive
-                                    </MenuItem>
-                                    <MenuItem value="defensive">
+                                    </MenuItem>,
+                                    <MenuItem key="defensive" value="defensive">
                                         Defensive
+                                    </MenuItem>,
+                                    <MenuItem key="specialTeams" value="specialTeams">
+                                        Special Teams
                                     </MenuItem>
-                                </>
+                                ]
                             ) : (
                                 <MenuItem disabled>
-                                    <em>Loading teams...</em>
+                                    <em>Select a team first</em>
                                 </MenuItem>
                             )}
                         </Select>
                     </Box>
+                    <Box sx={{ mb: 3 }}>
+                        <Typography sx={{ mb: 1, color: '#212D40' }}>
+                            Select Player
+                        </Typography>
+                        <Select
+                            fullWidth
+                            value={selectedPlayer}
+                            onChange={handlePlayerChange}
+                            displayEmpty
+                            sx={{ backgroundColor: 'white' }}
+                        >
+                            <MenuItem value="">
+                                <em>Select a player...</em>
+                            </MenuItem>
+                            {playersByType.length > 0 ? (
+                                playersByType.map((playerByType) => (
+                                    <MenuItem key={playerByType.playerID} value={playerByType.playerID}>
+                                        {playerByType.firstName} {playerByType.lastName}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>
+                                    <em>Select a team and player type first</em>
+                                </MenuItem>
+                            )}
+                        </Select>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+                        <Select
+                            fullWidth
+                            value={selectedStatType}
+                            onChange={handleStatTypeChange}
+                            displayEmpty
+                            sx={{ backgroundColor: 'white' }}
+                        >
+                            <MenuItem value="">
+                                <em>Select stat type...</em>
+                            </MenuItem>
+                            {statTypes.length > 0 ? (
+                                statTypes.map((statType) => (
+                                    <MenuItem key={statType.ID} value={statType.ID}>
+                                        {statType.type}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>
+                                    <em>Select a player first</em>
+                                </MenuItem>
+                            )}
+                        </Select>
+                        <Select
+                            fullWidth
+                            value={comparisonOperator}
+                            onChange={handleCompOperator}
+                            displayEmpty
+                            sx={{ backgroundColor: 'white' }}
+                        >
+                            <MenuItem value="">
+                                <em>Select comparison...</em>
+                            </MenuItem>
+                            <MenuItem value=">">&gt;</MenuItem>
+                            <MenuItem value="<">&lt;</MenuItem>
+                            <MenuItem value="=">&#61;</MenuItem>
+                            <MenuItem value="<=">&lt;&#61;</MenuItem>
+                            <MenuItem value=">=">&gt;&#61;</MenuItem>
+                        </Select>
+                        <TextField  
+                            fullWidth  
+                            placeholder="Enter number"  
+                            value={comparisonValue}  
+                            onChange={(e) => setComparisonValue(e.target.value)}  
+                            sx={{ backgroundColor: 'white' }}  
+                        />
+                    </Box>
+
                     <Box sx={{ display: 'flex', gap: 2 }}>
                         <Button
                             variant="contained"
