@@ -23,6 +23,7 @@ INNER JOIN
 WHERE
     TeamID = :TeamID
 AND
-    Position IN ('DL', 'LB', 'ILB', 'OLB', 'CB', 'DB', 'S', 'DE', 'DT', 'NT', 'EDGE','ATH')";
+    Position IN ('DL', 'LB', 'ILB', 'OLB', 'CB', 'DB', 'S', 'DE', 'DT', 'NT', 'EDGE','ATH')
+ORDER BY P.FirstName ASC";
     }
 }

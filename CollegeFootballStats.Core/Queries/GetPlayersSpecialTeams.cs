@@ -23,6 +23,7 @@ INNER JOIN
 WHERE
     TeamID = :TeamID
 AND
-    Position IN ('KR','PR','PK','P','LS','ATH')";
+    Position IN ('KR','PR','PK','P','LS','ATH')
+ORDER BY P.FirstName ASC";
     }
 }

@@ -23,6 +23,7 @@ INNER JOIN
 WHERE
     TeamID = :TeamID
 AND
-    Position IN ('OT', 'WR', 'RB', 'FB', 'WR', 'C', 'G', 'QB', 'TE', 'OL','ATH')";
+    Position IN ('OT', 'WR', 'RB', 'FB', 'WR', 'C', 'G', 'QB', 'TE', 'OL','ATH')
+ORDER BY P.FirstName ASC";
     }
 }

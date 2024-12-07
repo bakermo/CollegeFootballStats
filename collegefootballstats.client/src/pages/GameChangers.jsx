@@ -1,6 +1,7 @@
 import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper, Autocomplete, TextField } from '@mui/material';
 import Header from '../components/Header';
 import { useState, useEffect } from 'react';
+import PlayerImpactVisualization from '../components/PlayerImpactVisualization';
 
 function GameChangers() {
     const [seasonRange, setSeasonRange] = useState([2004, 2024]);
@@ -14,6 +15,8 @@ function GameChangers() {
     const [playerSearch, setPlayerSearch] = useState('');
     const [statTypes, setStatTypes] = useState([]);
     const [selectedStatType, setSelectedStatType] = useState('');
+    const [statCategories, setStatCategories] = useState([]);
+    const [selectedStatCategory, setSelectedStatCategory] = useState('');
     const [comparisonOperator, setComparisonOperator] = useState('');
     const [comparisonValue, setComparisonValue] = useState(null);
 
@@ -44,6 +47,14 @@ function GameChangers() {
             setStatTypes([]);
         }
     }, [selectedPlayer]);
+
+    useEffect(() => {
+        if (selectedStatType) {
+            fetchPlayerStatCategories(selectedStatType);
+        } else {
+            setStatCategories([]);
+        }
+    }, [selectedStatType]);
 
     const fetchPlayers = async (search) => {
         try {
@@ -99,6 +110,24 @@ function GameChangers() {
         }
     };
 
+    const fetchPlayerStatCategories = async () => {
+        try {
+            const response = await fetch(`/api/statCategories?type=${selectedStatType}`);
+            console.log(response.data);
+            const data = await response.json();
+            console.log('stat categories fetched:', data);
+            if (Array.isArray(data)) {
+                setStatCategories(data);
+            } else {
+                console.warn('Unexpected stat categories response format', data);
+                setStatCategories([]);
+            }
+        } catch (error) {
+            console.error('Error fetching stat categories:', error);
+            setStatCategories([]);
+        }
+    };
+
     const fetchTeams = async () => {
         try {
             const response = await fetch('/api/teams');
@@ -139,10 +168,19 @@ function GameChangers() {
     };
 
     const handleStatTypeChange = (event) => {
+        console.log("statTypes: ", statTypes);
         console.log("newValue: ", event.target.value);
         setSelectedStatType(event.target.value);
         console.log("selectedStattype: ", selectedStatType);
     };
+
+    const handleStatCategoryChange = (event) => {
+        console.log("statCategories: ", statCategories);
+        console.log("newValue: ", event.target.value);
+        setSelectedStatType(event.target.value);
+        console.log("selectedStattype: ", selectedStatType);
+    };
+
 
     const handleCompOperator = (event) => {
         console.log("newValue: ", event.target.value);
@@ -163,15 +201,37 @@ function GameChangers() {
     };
 
     const generateVisualization = async () => {
-        console.log('Generating visualization with:', {
-            seasonRange,
-            player: selectedPlayer
-        });
+            console.log('Generating visualization with:', {
+                seasonRange,
+                player: selectedPlayer,
+                team: selectedTeam,
+                statType: selectedStatType,
+                comparisonOperator,
+                comparisonValue
+            });
 
         try {
-            console.log(seasonRange);
-            const response = await fetch('/api/player-impact', );
-            console.log(response);
+            const params = new URLSearchParams({
+                teamID: selectedTeam,
+                playerID: selectedPlayer,
+                startYear: seasonRange[0],
+                endYear: seasonRange[1],
+                statType: selectedStatType,
+                statCategory: "passing", // Assuming statCategory is the same as statType
+                compOperator: comparisonOperator,
+                compValue: parseInt(comparisonValue, 10)
+            });
+
+            console.log(params)
+
+            console.log("getting response...");
+
+            const response = await fetch(`/api/player-impact?${params.toString()}`, {
+                method: 'POST',  // Use POST method for sending data
+            });
+
+            console.log("got response?", response);
+
             const data = await response.json();
             console.log('data fetched:', data);
             setVisualizationData(data);
@@ -446,7 +506,7 @@ function GameChangers() {
                             </MenuItem>
                             {statTypes.length > 0 ? (
                                 statTypes.map((statType) => (
-                                    <MenuItem key={statType.ID} value={statType.ID}>
+                                    <MenuItem key={statType.id} value={statType.type}>
                                         {statType.type}
                                     </MenuItem>
                                 ))
@@ -455,6 +515,28 @@ function GameChangers() {
                                     <em>Select a player first</em>
                                 </MenuItem>
                             )}
+                        </Select>
+                        <Select
+                                fullWidth
+                                value={selectedStatCategory}
+                                onChange={handleStatCategoryChange}
+                                displayEmpty
+                                sx={{ backgroundColor: 'white' }}
+                            >
+                                <MenuItem value="">
+                                    <em>Select stat category...</em>
+                                </MenuItem>
+                                {statCategories.length > 0 ? (
+                                    statCategories.map((statCategory) => (
+                                        <MenuItem key={statCategory.id} value={statCategory.category}>
+                                            {statCategory.category}
+                                        </MenuItem>
+                                    ))
+                                ) : (
+                                    <MenuItem disabled>
+                                        <em>Select a stat type first</em>
+                                    </MenuItem>
+                                )}
                         </Select>
                         <Select
                             fullWidth
@@ -527,7 +609,7 @@ function GameChangers() {
                             Select a player and team, then generate visualization
                         </Typography>
                     ) : (
-                        <Box>Visualization will go here</Box>
+                        <PlayerImpactVisualization data={visualizationData} />
                     )}
                 </Paper>
             </Container>
