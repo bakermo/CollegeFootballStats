@@ -271,6 +271,13 @@ app.MapGet("/teams/conference/{conferenceId}", async (SqlCommandManager queryMan
     return operation;
 });
 
+app.MapGet("/player-performance-by-position", async (SqlCommandManager queryManager, [FromQuery] string position, [FromQuery] int startYear, [FromQuery] int endYear) =>
+{
+    var query = new PlayerPerformanceByPosition(position, startYear, endYear);
+    var result = await queryManager.QueryAsync<PercentilePerformanceResult>(query);
+    return Results.Ok(result);
+});
+
 app.MapFallbackToFile("/index.html");
 
 app.Run();
