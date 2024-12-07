@@ -92,4 +92,11 @@ namespace CollegeFootballStats.Core.Models
     {
         public string Position { get; set; } = string.Empty;
     }
+
+    public class PercentilePerformanceResult
+    {
+        public int Percentile { get; set; }
+        public int DraftYear { get; set; }
+        public decimal AverageOverallPick { get; set; }
+    }
 }
