@@ -92,15 +92,17 @@ app.MapGet("/tuples", async (SqlCommandManager queryManager) => {
     {
         "TEAM", "COACH", "COACHINGRECORD", "CONFERENCE", "CONFERENCEMEMBERSHIP",
         "DRAFTPICK", "GAME", "ROSTER", "PLAYER", "PLAYERGAMESTAT",
-        "PLAYERSEASONSTAT", "POLL", "STATCATEGORY", "STATTYPE", "TEAMGAMESTAT"
+        "PLAYERSEASONSTAT", "POLL", "STATCATEGORY", "STATTYPE", "TEAMGAMESTAT", "RECRUITINGPLAYERS"
     };
 
     var response = new TupleCount();
-    var tasks = tableNames.Select(async tableName =>
-        await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable(tableName))
-    ).ToArray();
+    var results = new List<int>();
 
-    var results = await Task.WhenAll(tasks);
+    foreach (var tableName in tableNames)
+    {
+        var count = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable(tableName));
+        results.Add(count);
+    }
 
     response.Teams = results[0];
     response.Coaches = results[1];
@@ -117,6 +119,7 @@ app.MapGet("/tuples", async (SqlCommandManager queryManager) => {
     response.StatCategories = results[12];
     response.StatTypes = results[13];
     response.TeamGameStats = results[14];
+    response.RecruitingPlayers = results[15];
 
     response.TotalTuples = results.Sum();
 
