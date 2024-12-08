@@ -23,8 +23,7 @@ const CoachingImpactVisualization = ({ data }) => {
                             color: entry.color,
                             margin: '5px 0 0 0'
                         }}>
-                            {entry.name}: {Number(entry.value).toFixed(2)}<br />
-                            {entry.name === 'Win Percentage' ? 'Win %' : 'Rank'}: {Number(entry.value).toFixed(2)}
+                            {entry.name}: {entry.value === 0 ? 'Unranked' : Number(entry.value).toFixed(2)}
                         </p>
                     ))}
                 </div>
@@ -37,9 +36,9 @@ const CoachingImpactVisualization = ({ data }) => {
         return data.map(item => ({
             year: item.year,
             winPercentage: item.winPercentage,
-            apRank: item.apRank,
-            coachesPollRank: item.coachesPollRank,
-            playerCommitterRank: item.playerCommitterRank
+            apRank: item.apRank === 0 ? null : item.apRank,
+            coachesPollRank: item.coachesPollRank === 0 ? null : item.coachesPollRank,
+            playerCommitterRank: item.playerCommitterRank === 0 ? null : item.playerCommitterRank
         }));
     };
 
