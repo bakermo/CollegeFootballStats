@@ -71,7 +71,7 @@ namespace CollegeFootballStats.Core.Queries
         INNER JOIN GAME G ON PGS.Game = G.GameID
         WHERE G.Season BETWEEN 2004 AND 2024
         GROUP BY PGS.Player, PGS.Game, G.Season
-        HAVING SUM(CASE WHEN ST.Type = 'TD' AND SC.Category = 'passing' THEN PGS.StatValue ELSE 0 END) < 2
+        HAVING SUM(CASE WHEN ST.Type = 'TD' AND SC.Category = 'passing' THEN PGS.StatValue ELSE 0 END) {CompOperator} :CompValue
     ),
     GamesWithPlayerTDs AS (
         SELECT 

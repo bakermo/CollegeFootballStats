@@ -19,10 +19,25 @@ function GameChangers() {
     const [selectedStatCategory, setSelectedStatCategory] = useState('');
     const [comparisonOperator, setComparisonOperator] = useState('');
     const [comparisonValue, setComparisonValue] = useState(null);
+    const [selectedConference, setSelectedConference] = useState('');
+    const [conferences, setConferences] = useState([]);
+    const [loading, setLoading] = useState(false);
 
+    // Fetch conferences on component mount
     useEffect(() => {
-        fetchTeams();
+        fetchConferences();
     }, []);
+
+    // Fetch teams when conference is selected
+    useEffect(() => {
+        if (selectedConference) {
+            fetchTeams();
+        } else {
+            setTeams([]);
+            setSelectedTeam('');
+        }
+    }, [selectedConference]);
+
 
     useEffect(() => {
         if (playerSearch) {
@@ -56,21 +71,36 @@ function GameChangers() {
         }
     }, [selectedStatType]);
 
-    const fetchPlayers = async (search) => {
+    const fetchConferences = async () => {
         try {
-            const response = await fetch(`/api/players/${search}`);
-            console.log(response.data);
+            const response = await fetch("/api/conferences");
             const data = await response.json();
-            console.log('Players fetched:', data);
-            if (Array.isArray(data)) {
-                setPlayers(data);
+            console.log("Fetched conferences:", data);
+            setConferences(data);
+        } catch (error) {
+            console.error("Error fetching conferences:", error);
+        }
+    };
+
+    const fetchTeams = async () => {
+        try {
+            if (selectedConference) {
+                console.log("Fetching teams for conference:", selectedConference);
+                const response = await fetch(`/api/teams/conference/${selectedConference}`);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch teams');
+                }
+
+                const data = await response.json();
+                console.log("Fetched teams:", data);
+                setTeams(data);
             } else {
-                console.warn('Unexpected players response format', data);
-                setPlayers([]);
+                setTeams([]);
             }
         } catch (error) {
-            console.error('Error fetching players:', error);
-            setPlayers([]);
+            console.error("Error fetching teams:", error);
+            setTeams([]);
         }
     };
 
@@ -128,21 +158,10 @@ function GameChangers() {
         }
     };
 
-    const fetchTeams = async () => {
-        try {
-            const response = await fetch('/api/teams');
-            const data = await response.json();
-            console.log('Teams fetched:', data);
-            if (Array.isArray(data)) {
-                setTeams(data);
-            } else {
-                console.warn('Unexpected teams response format', data);
-                setTeams([]);
-            }
-        } catch (error) {
-            console.error('Error fetching teams:', error);
-            setTeams([]);
-        }
+    const handleConferenceChange = (event) => {
+        setSelectedConference(event.target.value);
+        setSelectedTeam('');
+        setVisualizationData(null);
     };
 
     const handleSeasonChange = (event, newValue) => {
@@ -196,8 +215,20 @@ function GameChangers() {
         setSeasonRange([2004, 2024]);
         setSelectedPlayer('');
         setSelectedTeam('');
+        setPlayers([]);
+        setPlayersByType([]);
+        setSelectedPlayerType('');
+        setTeams([]);
         setVisualizationData(null);
         setPlayerSearch('');
+        setStatTypes([]);
+        setSelectedStatType('');
+        setStatCategories([]);
+        setSelectedStatCategory('');
+        setComparisonOperator('');
+        setComparisonValue(null);
+        setSelectedConference('');
+        setConferences([]);
     };
 
     const generateVisualization = async () => {
@@ -209,6 +240,8 @@ function GameChangers() {
                 comparisonOperator,
                 comparisonValue
             });
+
+        setLoading(true);
 
         try {
             const params = new URLSearchParams({
@@ -237,6 +270,8 @@ function GameChangers() {
             setVisualizationData(data);
         } catch (error) {
             console.error('Error fetching visualization data:', error);
+        } finally {
+            setLoading(false);
         }
 
     };
@@ -406,6 +441,28 @@ function GameChangers() {
                        </Typography>
                     </Box>*/
                     }
+
+                    <Box sx={{ mb: 3 }}>
+                        <Typography sx={{ mb: 1, color: '#212D40' }}>
+                            Conference Selection
+                        </Typography>
+                        <Select
+                            fullWidth
+                            value={selectedConference}
+                            onChange={handleConferenceChange}
+                            displayEmpty
+                            sx={{ backgroundColor: 'white', mb: 2 }}
+                        >
+                            <MenuItem value="">
+                                <em>Select a conference...</em>
+                            </MenuItem>
+                            {conferences.map((conference) => (
+                                <MenuItem key={conference.conferenceId} value={conference.conferenceId}>
+                                    {conference.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </Box>
                     
                     <Box sx={{ mb: 3 }}>
                         <Typography sx={{ mb: 1, color: '#212D40' }}>
@@ -569,6 +626,7 @@ function GameChangers() {
                         <Button
                             variant="contained"
                             onClick={generateVisualization}
+                            disabled={!selectedConference || !selectedTeam || !selectedPlayer || loading}
                             sx={{
                                 backgroundColor: '#212D40',
                                 '&:hover': {
@@ -604,10 +662,14 @@ function GameChangers() {
                         backgroundColor: 'white'
                     }}
                 >
-                    {!visualizationData ? (
-                        <Typography color="text.secondary">
-                            Select a player and team, then generate visualization
-                        </Typography>
+                    {loading ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+                            <Typography>Loading visualization...</Typography>
+                        </Box>
+                    ) : !visualizationData ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+                                <Typography>Select a player and team, then generate visualization</Typography>
+                        </Box>
                     ) : (
                         <PlayerImpactVisualization data={visualizationData} />
                     )}
