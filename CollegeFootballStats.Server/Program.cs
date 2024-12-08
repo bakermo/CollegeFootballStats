@@ -168,6 +168,13 @@ app.MapGet("/statTypes", async (SqlCommandManager queryManager, [FromQuery] stri
     return Results.Ok(result);
 });
 
+app.MapGet("/statCategories", async (SqlCommandManager queryManager, [FromQuery] string playerID, string statType) =>
+{
+    ISqlCommand query = new GetPlayerStatCategories(playerID, statType);
+    var result = await queryManager.QueryAsync<StatCategory>(query);
+    return Results.Ok(result);
+});
+
 app.MapGet("/conferences", async (SqlCommandManager queryManager) =>
 {
     ISqlCommand query = new GetAllConferences();

@@ -112,7 +112,7 @@ function GameChangers() {
 
     const fetchPlayerStatCategories = async () => {
         try {
-            const response = await fetch(`/api/statCategories?type=${selectedStatType}`);
+            const response = await fetch(`/api/statCategories?playerID=${selectedPlayer}&statType=${selectedStatType}`);
             console.log(response.data);
             const data = await response.json();
             console.log('stat categories fetched:', data);
@@ -177,8 +177,8 @@ function GameChangers() {
     const handleStatCategoryChange = (event) => {
         console.log("statCategories: ", statCategories);
         console.log("newValue: ", event.target.value);
-        setSelectedStatType(event.target.value);
-        console.log("selectedStattype: ", selectedStatType);
+        setSelectedStatCategory(event.target.value);
+        console.log("selectedStatCategory: ", selectedStatCategory);
     };
 
 
@@ -217,7 +217,7 @@ function GameChangers() {
                 startYear: seasonRange[0],
                 endYear: seasonRange[1],
                 statType: selectedStatType,
-                statCategory: "passing", // Assuming statCategory is the same as statType
+                statCategory: selectedStatCategory,
                 compOperator: comparisonOperator,
                 compValue: parseInt(comparisonValue, 10)
             });
@@ -378,7 +378,7 @@ function GameChangers() {
                         </Typography>
                         <Autocomplete
                             options={players}
-                            getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+                            getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.position})`}
                             isOptionEqualToValue={(option, value) => option.playerID === value.playerID}
                             onChange={handlePlayerChangeSearch}
                             inputValue={playerSearch}
@@ -387,7 +387,7 @@ function GameChangers() {
                             }}
                             renderOption={(props, option) => (
                                 <li {...props} key={option.playerID}>
-                                    {option.firstName} {option.lastName}
+                                    {option.firstName} {option.lastName} ({option.position})
                                 </li>
                             )}
                             renderInput={(params) => (
@@ -482,7 +482,7 @@ function GameChangers() {
                             {playersByType.length > 0 ? (
                                 playersByType.map((playerByType) => (
                                     <MenuItem key={playerByType.playerID} value={playerByType.playerID}>
-                                        {playerByType.firstName} {playerByType.lastName}
+                                        {playerByType.firstName} {playerByType.lastName} ({playerByType.position})
                                     </MenuItem>
                                 ))
                             ) : (
@@ -597,10 +597,8 @@ function GameChangers() {
                     elevation={2}
                     sx={{
                         p: 4,
-                        height: '400px',
+                        height: '800px',
                         display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
                         backgroundColor: 'white'
                     }}
                 >

@@ -9,8 +9,20 @@ const PlayerImpactVisualization = ({ data }) => {
         weekYear: `Week ${item.week}, ${item.season}`
     }));
 
+    // Aggregate data for win percentage
+    const aggregatedData = formattedData.reduce((acc, item) => {
+        const existingItem = acc.find(d => d.season === item.season);
+        if (existingItem) {
+            existingItem.winPercentage = (existingItem.winPercentage + item.winPercentage) / 2;
+        } else {
+            acc.push({ ...item });
+        }
+        return acc;
+    }, []);
+
     // Debug: Log the formatted data
     console.log('Formatted Data:', formattedData);
+    console.log('Aggregated Data:', aggregatedData);
 
     return (
         <Box sx={{ p: 4, backgroundColor: 'white', width: '100%', height: 400 }}>
@@ -19,22 +31,30 @@ const PlayerImpactVisualization = ({ data }) => {
             </Typography>
             {data.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={aggregatedData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="season" label={{ value: 'Year', position: 'insideBottomRight', offset: 0 }} />
+                        <YAxis yAxisId="left" label={{ value: 'Stat Value', angle: -90, position: 'insideLeft' }} />
+                        <YAxis yAxisId="right" orientation="right" domain={[0, 25]} label={{ value: 'Rank', angle: -90, position: 'insideRight' }} />
+                        <Tooltip />
+                        <Legend />
+                        <Line yAxisId="right" type="monotone" dataKey="winPercentage" stroke="#82ca9d" />
+                    </LineChart>
                     <LineChart data={formattedData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="weekYear" label={{ value: 'Week, Year', position: 'insideBottomRight', offset: 0 }} />
                         <YAxis yAxisId="left" label={{ value: 'Stat Value', angle: -90, position: 'insideLeft' }} />
-                        <YAxis yAxisId="right" orientation="right" label={{ value: 'Win % / Rank', angle: -90, position: 'insideRight' }} />
+                        <YAxis yAxisId="right" orientation="right" domain={[0, 25]} label={{ value: 'Rank', angle: -90, position: 'insideRight' }} />
                         <Tooltip />
                         <Legend />
                         <Line yAxisId="left" type="monotone" dataKey="statValue" stroke="#8884d8" activeDot={{ r: 8 }} />
-                        <Line yAxisId="right" type="monotone" dataKey="winPercentage" stroke="#82ca9d" />
-                        <Line yAxisId="right" type="monotone" dataKey="APTop25Rank" stroke="#ff7300" />
-                        <Line yAxisId="right" type="monotone" dataKey="CoachesPollRank" stroke="#387908" />
-                        <Line yAxisId="right" type="monotone" dataKey="PlayoffCommitteeRank" stroke="#ff0000" />
+                        <Line yAxisId="right" type="monotone" dataKey="apTop25Rank" stroke="#ff7300" />
+                        <Line yAxisId="right" type="monotone" dataKey="coachesPollRank" stroke="#387908" />
+                        <Line yAxisId="right" type="monotone" dataKey="playoffCommitteeRank" stroke="#ff0000" />
                     </LineChart>
                 </ResponsiveContainer>
             ) : (
-                <Typography color="text.secondary">Loading data...</Typography>
+                <Typography color="text.secondary">No data found.</Typography>
             )}
         </Box>
     );

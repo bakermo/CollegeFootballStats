@@ -126,6 +126,6 @@ namespace CollegeFootballStats.Core.Queries
     LEFT JOIN POLL PCR ON G.Season = PCR.Season AND G.Week = PCR.Week AND PCR.TeamID = T.TeamID  AND G.IsPostSeason = PCR.IsPostSeason AND PCR.Poll = 'Playoff Committee Rankings'
     WHERE P.PlayerID = :PlayerID AND T.TeamID = :TeamID AND ST.Type = :StatType AND SC.Category = :StatCategory AND PGS.StatValue {CompOperator} :CompValue
     AND G.Season BETWEEN :StartYear AND :EndYear
-    ORDER BY G.Season";
+    ORDER BY G.Season ASC, G.IsPostSeason ASC, G.Week ASC";
     }
 }
