@@ -175,21 +175,68 @@ function StarPower() {
                     </Typography>
 
                     <Box sx={{ mb: 4 }}>
-                        <Slider
-                            value={seasonRange}
-                            onChange={handleSeasonChange}
-                            valueLabelDisplay="auto"
-                            min={2004}
-                            max={2024}
+                        <Box
                             sx={{
-                                color: '#3F4C64',
-                                '& .MuiSlider-thumb': {
-                                    '&:hover': {
-                                        boxShadow: '0 0 0 8px rgba(63, 76, 100, 0.16)'
-                                    }
-                                }
+                                px: 2,
+                                position: 'relative',
+                                mb: 1
                             }}
-                        />
+                        >
+                            <Slider
+                                value={seasonRange}
+                                onChange={handleSeasonChange}
+                                valueLabelDisplay="auto"
+                                min={2004}
+                                max={2024}
+                                valueLabelFormat={(value) => `${value}`}
+                                sx={{
+                                    color: '#3F4C64',
+                                    '& .MuiSlider-thumb': {
+                                        '&:hover, &.Mui-focusVisible': {
+                                            boxShadow: '0 0 0 8px rgba(63, 76, 100, 0.16)'
+                                        }
+                                    },
+                                    '& .MuiSlider-rail': {
+                                        backgroundColor: '#e0e0e0'
+                                    },
+                                    '& .MuiSlider-valueLabel': {
+                                        backgroundColor: '#212D40'
+                                    }
+                                }}
+                            />
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                px: 2,
+                                width: '100%'
+                            }}
+                        >
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: '#3F4C64',
+                                    fontWeight: 500,
+                                    position: 'relative',
+                                    left: '2px'
+                                }}
+                            >
+                                04'
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: '#3F4C64',
+                                    fontWeight: 500,
+                                    position: 'relative',
+                                    right: '2px'
+                                }}
+                            >
+                                24'
+                            </Typography>
+                        </Box>
                     </Box>
 
                     <Box sx={{ mb: 3 }}>
