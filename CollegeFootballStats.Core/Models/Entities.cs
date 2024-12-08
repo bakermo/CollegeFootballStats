@@ -118,4 +118,12 @@ namespace CollegeFootballStats.Core.Models
         public int DraftYear { get; set; }
         public decimal AverageOverallPick { get; set; }
     }
+    public class TeamRecruitingImpactResult
+    {
+        public int TeamID { get; set; }
+        public string School { get; set; } = string.Empty;
+        public int Year { get; set; }
+        public decimal WinRate { get; set; }
+        public decimal AverageRecruitRating { get; set; }
+    }
 }

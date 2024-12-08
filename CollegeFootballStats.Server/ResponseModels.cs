@@ -17,6 +17,7 @@
         public int StatTypes { get; set; }
         public int Teams { get; set; }
         public int TeamGameStats { get; set; }
+        public int RecruitingPlayers { get; set; }
         public int TotalTuples { get; set; }
     }
 

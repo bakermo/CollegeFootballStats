@@ -189,7 +189,6 @@ function DraftDayDividends() {
                                     left: '2px'
                                 }}
                             >
-                                10'
                             </Typography>
                             <Typography
                                 variant="body2"
@@ -200,7 +199,6 @@ function DraftDayDividends() {
                                     right: '2px'
                                 }}
                             >
-                                24'
                             </Typography>
                         </Box>
                     </Box>

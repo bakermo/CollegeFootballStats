@@ -1,4 +1,3 @@
-// src/components/DraftDayDividendsVisualization.jsx
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -75,6 +74,7 @@ const DraftDayDividendsVisualization = ({ data }) => {
                     label={{ value: 'Draft Year', position: 'insideBottom', offset: -5 }}
                 />
                 <YAxis
+                    reversed
                     label={{
                         value: 'Average Overall Pick',
                         angle: -90,

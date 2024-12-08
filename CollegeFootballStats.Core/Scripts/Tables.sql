@@ -145,3 +145,13 @@ CREATE TABLE StatType(
 	Type VARCHAR2(20),
 	PRIMARY KEY(ID)
 );
+
+CREATE TABLE RecruitingPlayers (
+    AthleteID INT PRIMARY KEY,
+    Name VARCHAR2(50) NOT NULL,
+    Year INT NOT NULL,
+    Ranking INT,
+    CommittedTo VARCHAR2(50),
+    Stars INT,
+    Rating NUMBER(5, 4)
+);

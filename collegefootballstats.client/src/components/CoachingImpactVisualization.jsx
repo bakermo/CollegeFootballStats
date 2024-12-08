@@ -1,179 +1,116 @@
-import React, { useRef, useEffect } from 'react';
-import * as d3 from 'd3';
+import React from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const CoachingImpactVisualization = ({ data }) => {
-    const svgRef = useRef();
+    if (!data || data.length === 0) {
+        return <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            No data available
+        </div>;
+    }
 
-    useEffect(() => {
-        if (!data) return;
+    const CustomTooltip = ({ active, payload, label }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div style={{
+                    backgroundColor: 'white',
+                    padding: '10px',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px'
+                }}>
+                    <p style={{ margin: 0 }}>Year: {label}</p>
+                    {payload.map((entry) => (
+                        <p key={entry.name} style={{
+                            color: entry.color,
+                            margin: '5px 0 0 0'
+                        }}>
+                            {entry.name}: {Number(entry.value).toFixed(2)}<br />
+                            {entry.name === 'Win Percentage' ? 'Win %' : 'Rank'}: {Number(entry.value).toFixed(2)}
+                        </p>
+                    ))}
+                </div>
+            );
+        }
+        return null;
+    };
 
-        const svg = d3.select(svgRef.current);
-        svg.selectAll('*').remove(); // Clear previous content
+    const processData = (data) => {
+        return data.map(item => ({
+            year: item.year,
+            winPercentage: item.winPercentage,
+            apRank: item.apRank,
+            coachesPollRank: item.coachesPollRank,
+            playerCommitterRank: item.playerCommitterRank
+        }));
+    };
 
-        const width = 800;
-        const height = 400;
-        const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+    const processedData = processData(data);
 
-        const x = d3.scaleLinear()
-            .domain(d3.extent(data, d => d.year))
-            .range([margin.left, width - margin.right]);
-
-        const y1 = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.winPercentage)]).nice()
-            .range([height - margin.bottom, margin.top]);
-
-        const y2 = d3.scaleLinear()
-            .domain([d3.max(data, d => Math.max(d.apRank, d.coachesPollRank, d.playerCommitterRank)), 1]).nice()
-            .range([height - margin.bottom, margin.top]);
-
-        const xAxis = g => g
-            .attr("transform", `translate(0,${height - margin.bottom})`)
-            .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0));
-
-        const y1Axis = g => g
-            .attr("transform", `translate(${margin.left},0)`)
-            .call(d3.axisLeft(y1))
-            .call(g => g.select(".domain").remove())
-            .call(g => g.append("text")
-                .attr("x", -margin.left)
-                .attr("y", 10)
-                .attr("fill", "currentColor")
-                .attr("text-anchor", "start")
-                .text("Win Percentage (%)"));
-
-        const y2Axis = g => g
-            .attr("transform", `translate(${width - margin.right},0)`)
-            .call(d3.axisRight(y2))
-            .call(g => g.select(".domain").remove())
-            .call(g => g.append("text")
-                .attr("x", margin.right)
-                .attr("y", 10)
-                .attr("fill", "currentColor")
-                .attr("text-anchor", "end")
-                .text("Rank"));
-
-        svg.append("g")
-            .call(xAxis);
-
-        svg.append("g")
-            .call(y1Axis);
-
-        svg.append("g")
-            .call(y2Axis);
-
-        const line1 = d3.line()
-            .x(d => x(d.year))
-            .y(d => y1(d.winPercentage));
-
-        const line2 = d3.line()
-            .x(d => x(d.year))
-            .y(d => y2(d.apRank));
-
-        const line3 = d3.line()
-            .x(d => x(d.year))
-            .y(d => y2(d.coachesPollRank));
-
-        const line4 = d3.line()
-            .x(d => x(d.year))
-            .y(d => y2(d.playerCommitterRank));
-
-        svg.append("path")
-            .datum(data)
-            .attr("fill", "none")
-            .attr("stroke", "steelblue")
-            .attr("stroke-width", 1.5)
-            .attr("d", line1);
-
-        svg.append("path")
-            .datum(data)
-            .attr("fill", "none")
-            .attr("stroke", "red")
-            .attr("stroke-width", 1.5)
-            .attr("d", line2);
-
-        svg.append("path")
-            .datum(data)
-            .attr("fill", "none")
-            .attr("stroke", "green")
-            .attr("stroke-width", 1.5)
-            .attr("d", line3);
-
-        svg.append("path")
-            .datum(data)
-            .attr("fill", "none")
-            .attr("stroke", "orange")
-            .attr("stroke-width", 1.5)
-            .attr("d", line4);
-
-        // Add legend
-        const legend = svg.append("g")
-            .attr("transform", `translate(${width - margin.right - 150},${margin.top})`);
-
-        legend.append("rect")
-            .attr("width", 150)
-            .attr("height", 80)
-            .attr("fill", "white")
-            .attr("stroke", "black");
-
-        legend.append("line")
-            .attr("x1", 10)
-            .attr("y1", 10)
-            .attr("x2", 30)
-            .attr("y2", 10)
-            .attr("stroke", "steelblue")
-            .attr("stroke-width", 2);
-
-        legend.append("text")
-            .attr("x", 40)
-            .attr("y", 10)
-            .attr("dy", "0.35em")
-            .text("Win %");
-
-        legend.append("line")
-            .attr("x1", 10)
-            .attr("y1", 30)
-            .attr("x2", 30)
-            .attr("y2", 30)
-            .attr("stroke", "red")
-            .attr("stroke-width", 2);
-
-        legend.append("text")
-            .attr("x", 40)
-            .attr("y", 30)
-            .attr("dy", "0.35em")
-            .text("AP Rank");
-
-        legend.append("line")
-            .attr("x1", 10)
-            .attr("y1", 50)
-            .attr("x2", 30)
-            .attr("y2", 50)
-            .attr("stroke", "green")
-            .attr("stroke-width", 2);
-
-        legend.append("text")
-            .attr("x", 40)
-            .attr("y", 50)
-            .attr("dy", "0.35em")
-            .text("Coaches Poll Rank");
-
-        legend.append("line")
-            .attr("x1", 10)
-            .attr("y1", 70)
-            .attr("x2", 30)
-            .attr("y2", 70)
-            .attr("stroke", "orange")
-            .attr("stroke-width", 2);
-
-        legend.append("text")
-            .attr("x", 40)
-            .attr("y", 70)
-            .attr("dy", "0.35em")
-            .text("Playoff Committee Rank");
-
-    }, [data]);
-
-    return <svg ref={svgRef} width={800} height={400}></svg>;
+    return (
+        <ResponsiveContainer width="100%" height={400}>
+            <LineChart
+                data={processedData}
+                margin={{ top: 5, right: 80, left: 20, bottom: 5 }}
+            >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                    dataKey="year"
+                    label={{ value: 'Year', position: 'insideBottom', offset: -5 }}
+                />
+                <YAxis
+                    yAxisId="left"
+                    label={{
+                        value: 'Win Percentage (%)',
+                        angle: -90,
+                        position: 'insideLeft'
+                    }}
+                />
+                <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    reversed
+                    label={{
+                        value: 'Rank',
+                        angle: -90,
+                        position: 'insideRight'
+                    }}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Line
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey="winPercentage"
+                    name="Win Percentage"
+                    stroke="#8884d8"
+                    activeDot={{ r: 8 }}
+                />
+                <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="apRank"
+                    name="AP Rank"
+                    stroke="#ff8042"
+                    activeDot={{ r: 8 }}
+                />
+                <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="coachesPollRank"
+                    name="Coaches Poll Rank"
+                    stroke="#82ca9d"
+                    activeDot={{ r: 8 }}
+                />
+                <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="playerCommitterRank"
+                    name="Playoff Committee Rank"
+                    stroke="#ffc658"
+                    activeDot={{ r: 8 }}
+                />
+            </LineChart>
+        </ResponsiveContainer>
+    );
 };
 
 export default CoachingImpactVisualization;
