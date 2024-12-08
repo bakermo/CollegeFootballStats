@@ -1,7 +1,7 @@
 import { Card, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-export default function AnalysisCard({ title, description, path }) {
+export default function AnalysisCard({ title, description, path, imageSrc }) {
     const navigate = useNavigate();
 
     return (
@@ -13,11 +13,11 @@ export default function AnalysisCard({ title, description, path }) {
                 height: '200px',
                 cursor: 'pointer',
                 backgroundColor: '#fff',
-                transition: 'all 0.3s ease-in-out', // Smooth transition for all changes
+                transition: 'all 0.3s ease-in-out', 
                 '&:hover': {
                     backgroundColor: '#262a42',
-                    transform: 'translateY(-4px)', // Slight lift effect
-                    boxShadow: '0 6px 12px rgba(82, 101, 156, 0.2)', // Custom shadow matching hover color
+                    transform: 'translateY(-4px)', 
+                    boxShadow: '0 6px 12px rgba(82, 101, 156, 0.2)', 
                     '& .card-text': {
                         color: '#fff'
                     },
@@ -44,7 +44,7 @@ export default function AnalysisCard({ title, description, path }) {
                         mb: 1,
                         color: '#212D40',
                         fontFamily: 'Georgia, serif',
-                        transition: 'color 0.3s ease-in-out' // Smooth color transition
+                        transition: 'color 0.3s ease-in-out'
                     }}
                 >
                     {title}
@@ -57,22 +57,32 @@ export default function AnalysisCard({ title, description, path }) {
                         color: '#666',
                         fontWeight: 400,
                         lineHeight: 1.5,
-                        transition: 'color 0.3s ease-in-out' // Smooth color transition
+                        transition: 'color 0.3s ease-in-out'
                     }}
                 >
                     {description}
                 </Typography>
             </Box>
-            <Box sx={{
-                width: '50%',
-                backgroundColor: '#f5f5f5',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <Typography sx={{ color: '#666' }}>
-                    Image Placeholder
-                </Typography>
+            <Box
+                sx={{
+                    width: '50%',
+                    backgroundColor: '#f5f5f5',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden', 
+                }}
+            >
+                <img
+                    src={imageSrc}
+                    alt={title}
+                    style={{
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'fill', 
+                        objectPosition: 'center', 
+                    }}
+                />
             </Box>
         </Card>
     );

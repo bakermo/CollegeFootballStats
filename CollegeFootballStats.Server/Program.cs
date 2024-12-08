@@ -244,6 +244,13 @@ app.MapGet("/player-performance-by-position", async (SqlCommandManager queryMana
     return Results.Ok(result);
 });
 
+app.MapGet("/recruit-influence", async (SqlCommandManager queryManager, [FromQuery] string conferenceId, [FromQuery] string? teamId, [FromQuery] string startYear, [FromQuery] string endYear) =>
+{
+    var query = new TeamRecruitingImpact(conferenceId, teamId, startYear, endYear);
+    var result = await queryManager.QueryAsync<TeamRecruitingImpactResult>(query);
+    return Results.Ok(result);
+});
+
 app.MapFallbackToFile("/index.html");
 
 app.Run();

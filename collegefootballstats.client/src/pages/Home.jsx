@@ -8,27 +8,32 @@ const analysisCards = [
     {
         title: "Game Changers: Player Impact",
         description: "For the query about individual player performance influencing team success",
-        path: "/player-impact"
+        path: "/player-impact",
+        imageSrc: "/player.jpg"
     },
     {
-        title: "Star Power: Recruits to Pros",
-        description: "For the query about recruiting class ratings and NFL draft outcomes",
-        path: "/recruits-to-pros"
+        title: "Star Power: Recruit Class Influence",
+        description: "For the query about how average recruit class rating influences conference/team performance in their first year",
+        path: "/recruits-firstyear-influence",
+        imageSrc: "/recruit.jpg"
     },
     {
         title: "Conference Clash: Offensive Evolution",
         description: "For the query about how offensive and defensive metrics have evolved within conferences",
-        path: "/conference-evolution"
+        path: "/conference-evolution",
+        imageSrc: "/offense.jpg"
     },
     {
         title: "Sideline Shuffle: Coaching Impact",
         description: "For the query about how coaching changes affect team performance",
-        path: "/coaching-impact"
+        path: "/coaching-impact",
+        imageSrc: "/coach.jpg"
     },
     {
         title: "Draft Day Dividends: Position Performance",
         description: "For the query about player performance metrics and their affect on NFL draft rounds",
-        path: "/draft-performance"
+        path: "/draft-performance",
+        imageSrc: "/draft.jpg"
     }
 ];
 
@@ -114,6 +119,7 @@ function Home() {
                             title={card.title}
                             description={card.description}
                             path={card.path}
+                            imageSrc={card.imageSrc}
                         />
                     ))}
 

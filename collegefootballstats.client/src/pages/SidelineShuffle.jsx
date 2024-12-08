@@ -3,7 +3,6 @@ import Header from '../components/Header';
 import { useState, useEffect } from 'react';
 import CoachingImpactVisualization from '../components/CoachingImpactVisualization';
 
-
 function SidelineShuffle() {
     const [seasonRange, setSeasonRange] = useState([2004, 2024]);
     const [selectedTeam, setSelectedTeam] = useState('');
@@ -11,13 +10,18 @@ function SidelineShuffle() {
     const [teams, setTeams] = useState([]);
     const [coaches, setCoaches] = useState([]);
     const [visualizationData, setVisualizationData] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         fetchTeams();
     }, []);
 
     useEffect(() => {
-        fetchCoaches();
+        if (selectedTeam) {
+            fetchCoaches();
+        } else {
+            setCoaches([]);
+        }
     }, [selectedTeam]);
 
     const fetchTeams = async () => {
@@ -25,12 +29,7 @@ function SidelineShuffle() {
             const response = await fetch('/api/teams');
             const data = await response.json();
             console.log('Teams fetched:', data);
-            if (Array.isArray(data)) {
-                setTeams(data);
-            } else {
-                console.warn('Unexpected teams response format', data);
-                setTeams([]);
-            }
+            setTeams(data);
         } catch (error) {
             console.error('Error fetching teams:', error);
             setTeams([]);
@@ -42,12 +41,7 @@ function SidelineShuffle() {
             const response = await fetch(`/api/coaches/${selectedTeam}`);
             const data = await response.json();
             console.log('Coaches fetched:', data);
-            if (Array.isArray(data)) {
-                setCoaches(data);
-            } else {
-                console.warn('Unexpected coaches response format', data);
-                setCoaches([]);
-            }
+            setCoaches(data);
         } catch (error) {
             console.error('Error fetching coaches:', error);
             setCoaches([]);
@@ -59,17 +53,14 @@ function SidelineShuffle() {
     };
 
     const handleTeamChange = (event) => {
-        console.log(teams);
-        console.log(selectedTeam);
         setSelectedTeam(event.target.value);
-        console.log(selectedTeam);
+        setSelectedCoach('');
+        setVisualizationData(null);
     };
 
     const handleCoachChange = (event) => {
-        console.log(coaches);
-        console.log(selectedCoach);
         setSelectedCoach(event.target.value);
-        console.log(selectedCoach);
+        setVisualizationData(null);
     };
 
     const handleReset = () => {
@@ -80,23 +71,20 @@ function SidelineShuffle() {
     };
 
     const generateVisualization = async () => {
-        console.log('Generating visualization with:', {
-            seasonRange,
-            team: selectedTeam,
-            coach: selectedCoach
-        });
+        if (!selectedTeam || !selectedCoach) return;
 
+        setLoading(true);
         try {
-            console.log(seasonRange);
             const response = await fetch(`/api/coaching-impact?teamId=${selectedTeam}&coachId=${selectedCoach}&startYear=${seasonRange[0]}&endYear=${seasonRange[1]}`);
-            console.log(response);
             const data = await response.json();
             console.log('data fetched:', data);
             setVisualizationData(data);
         } catch (error) {
             console.error('Error fetching visualization data:', error);
+            setVisualizationData(null);
+        } finally {
+            setLoading(false);
         }
-
     };
 
     return (
@@ -166,68 +154,21 @@ function SidelineShuffle() {
                     </Typography>
 
                     <Box sx={{ mb: 4 }}>
-                        <Box
+                        <Slider
+                            value={seasonRange}
+                            onChange={handleSeasonChange}
+                            valueLabelDisplay="auto"
+                            min={2004}
+                            max={2024}
                             sx={{
-                                px: 2,
-                                position: 'relative',
-                                mb: 1
-                            }}
-                        >
-                            <Slider
-                                value={seasonRange}
-                                onChange={handleSeasonChange}
-                                valueLabelDisplay="auto"
-                                min={2004}
-                                max={2024}
-                                valueLabelFormat={(value) => `${value}`}
-                                sx={{
-                                    color: '#3F4C64',
-                                    '& .MuiSlider-thumb': {
-                                        '&:hover, &.Mui-focusVisible': {
-                                            boxShadow: '0 0 0 8px rgba(63, 76, 100, 0.16)'
-                                        }
-                                    },
-                                    '& .MuiSlider-rail': {
-                                        backgroundColor: '#e0e0e0'
-                                    },
-                                    '& .MuiSlider-valueLabel': {
-                                        backgroundColor: '#212D40'
+                                color: '#3F4C64',
+                                '& .MuiSlider-thumb': {
+                                    '&:hover': {
+                                        boxShadow: '0 0 0 8px rgba(63, 76, 100, 0.16)'
                                     }
-                                }}
-                            />
-                        </Box>
-
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                px: 2,
-                                width: '100%'
+                                }
                             }}
-                        >
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: '#3F4C64',
-                                    fontWeight: 500,
-                                    position: 'relative',
-                                    left: '2px'
-                                }}
-                            >
-                                04'
-                            </Typography>
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: '#3F4C64',
-                                    fontWeight: 500,
-                                    position: 'relative',
-                                    right: '2px'
-                                }}
-                            >
-                                24'
-                            </Typography>
-                        </Box>
+                        />
                     </Box>
 
                     <Box sx={{ mb: 3 }}>
@@ -244,17 +185,11 @@ function SidelineShuffle() {
                             <MenuItem value="">
                                 <em>Select a team...</em>
                             </MenuItem>
-                            {teams.length > 0 ? (
-                                teams.map((team) => (
-                                    <MenuItem key={team.teamId} value={team.teamId}>
-                                        {team.school}
-                                    </MenuItem>
-                                ))
-                            ) : (
-                                <MenuItem disabled>
-                                    <em>Loading teams...</em>
+                            {teams.map((team) => (
+                                <MenuItem key={team.teamId} value={team.teamId}>
+                                    {team.school}
                                 </MenuItem>
-                            )}
+                            ))}
                         </Select>
                     </Box>
 
@@ -272,17 +207,11 @@ function SidelineShuffle() {
                             <MenuItem value="">
                                 <em>Select a coach...</em>
                             </MenuItem>
-                            {coaches.length > 0 ? (
-                                coaches.map((coach) => (
-                                    <MenuItem key={coach.coachID} value={coach.coachID}>
-                                        {`${coach.firstName} ${coach.lastName}`}
-                                    </MenuItem>
-                                ))
-                            ) : (
-                                <MenuItem disabled>
-                                    <em>Loading coaches...</em>
+                            {coaches.map((coach) => (
+                                <MenuItem key={coach.coachID} value={coach.coachID}>
+                                    {`${coach.firstName} ${coach.lastName}`}
                                 </MenuItem>
-                            )}
+                            ))}
                         </Select>
                     </Box>
 
@@ -290,14 +219,13 @@ function SidelineShuffle() {
                         <Button
                             variant="contained"
                             onClick={generateVisualization}
+                            disabled={!selectedTeam || !selectedCoach || loading}
                             sx={{
                                 backgroundColor: '#212D40',
-                                '&:hover': {
-                                    backgroundColor: '#3F4C64'
-                                }
+                                '&:hover': { backgroundColor: '#3F4C64' }
                             }}
                         >
-                            Generate Visualization
+                            {loading ? 'Loading...' : 'Generate Visualization'}
                         </Button>
                         <Button
                             variant="outlined"
@@ -320,17 +248,18 @@ function SidelineShuffle() {
                     elevation={2}
                     sx={{
                         p: 4,
-                        height: '400px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        minHeight: '500px',
                         backgroundColor: 'white'
                     }}
                 >
-                    {!visualizationData ? (
-                        <Typography color="text.secondary">
-                            Select a team and coach, then generate visualization
-                        </Typography>
+                    {loading ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+                            <Typography>Loading visualization...</Typography>
+                        </Box>
+                    ) : !visualizationData ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+                            <Typography>Select a team and coach, then generate visualization</Typography>
+                        </Box>
                     ) : (
                         <CoachingImpactVisualization data={visualizationData} />
                     )}
