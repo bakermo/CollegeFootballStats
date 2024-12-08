@@ -371,8 +371,8 @@ function GameChangers() {
                             </Typography>
                         </Box>
                     </Box>
-
-                    <Box sx={{ mb: 3 }}>
+                    
+                    {/*<Box sx={{ mb: 3 }}>
                         <Typography sx={{ mb: 1, color: '#212D40' }}>
                             Search Player
                         </Typography>
@@ -401,10 +401,12 @@ function GameChangers() {
                         />
                     </Box>
                     <Box sx={{ mb: 3, textAlign: 'center' }}>
-                        <Typography variant="h6" sx={{ color: '#212D40' }}>
-                            OR
-                        </Typography>
-                    </Box>
+                       <Typography variant="h6" sx={{ color: '#212D40' }}>
+                             OR
+                       </Typography>
+                    </Box>*/
+                    }
+                    
                     <Box sx={{ mb: 3 }}>
                         <Typography sx={{ mb: 1, color: '#212D40' }}>
                             Select Team
