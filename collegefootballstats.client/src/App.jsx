@@ -38,7 +38,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/player-impact" element={<GameChangers />} />
-                    <Route path="/recruits-to-pros" element={<StarPower />} />
+                    <Route path="/recruits-firstyear-influence" element={<StarPower />} />
                     <Route path="/conference-evolution" element={<ConferenceClash />} />
                     <Route path="/coaching-impact" element={<SidelineShuffle />} />
                     <Route path="/draft-performance" element={<DraftDayDividends />} />

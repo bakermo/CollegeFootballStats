@@ -102,6 +102,9 @@ while (actionChoice != (int)ImporterAction.Exit)
                 case ImportType.TeamGameStats:
                     importer = new TeamGameStatsImporter(importerConfig, importerLogger);
                     break;
+                case ImportType.RecruitingPlayers:
+                    importer = new RecruitingPlayersImporter(importerConfig, importerLogger);
+                    break;
                 default:
                     Console.WriteLine("Invalid import type.");
                     break;
@@ -193,4 +196,5 @@ public enum ImportType
     Polls,
     Teams,
     TeamGameStats,
+    RecruitingPlayers
 }

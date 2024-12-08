@@ -9,7 +9,7 @@ export default function Header() {
 
     const menuItems = [
         { title: 'Game Changers', path: '/player-impact' },
-        { title: 'Star Power', path: '/recruits-to-pros' },
+        { title: 'Star Power', path: '/recruits-firstyear-influence' },
         { title: 'Conference Clash', path: '/conference-evolution' },
         { title: 'Sideline Shuffle', path: '/coaching-impact' },
         { title: 'Draft Day Dividends', path: '/draft-performance' },

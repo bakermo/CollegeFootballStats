@@ -1,12 +1,107 @@
-import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper, RadioGroup, FormControlLabel, Radio, FormControl } from '@mui/material';
+// src/pages/ConferenceClash.jsx
+import {
+    Box,
+    Container,
+    Typography,
+    Slider,
+    Select,
+    MenuItem,
+    Button,
+    Paper
+} from '@mui/material';
 import Header from '../components/Header';
-import { useState } from 'react';
+import ConferenceEvolutionVisualization from '../components/ConferenceEvolutionVisualization';
+import { useState, useEffect } from 'react';
 
 function ConferenceClash() {
-    const [seasonRange, setSeasonRange] = useState([4, 24]);
+    const [seasonRange, setSeasonRange] = useState([2004, 2024]);
     const [selectedConference, setSelectedConference] = useState('');
+    const [selectedTeam, setSelectedTeam] = useState('');
+    const [conferences, setConferences] = useState([]);
+    const [teams, setTeams] = useState([]);
     const [visualizationData, setVisualizationData] = useState(null);
-    const [analysisType, setAnalysisType] = useState('offensive'); // 'offensive' or 'defensive'
+    const [loading, setLoading] = useState(false);
+
+    // Fetch conferences on component mount
+    useEffect(() => {
+        fetchConferences();
+    }, []);
+
+    // Fetch teams when conference is selected
+    useEffect(() => {
+        if (selectedConference) {
+            fetchTeams();
+        } else {
+            setTeams([]);
+            setSelectedTeam('');
+        }
+    }, [selectedConference]);
+
+    const fetchConferences = async () => {
+        try {
+            const response = await fetch("/api/conferences");
+            const data = await response.json();
+            console.log("Fetched conferences:", data);
+            setConferences(data);
+        } catch (error) {
+            console.error("Error fetching conferences:", error);
+        }
+    };
+
+    const fetchTeams = async () => {
+        try {
+            if (selectedConference) {
+                console.log("Fetching teams for conference:", selectedConference);
+                const response = await fetch(`/api/teams/conference/${selectedConference}`);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch teams');
+                }
+
+                const data = await response.json();
+                console.log("Fetched teams:", data);
+                setTeams(data);
+            } else {
+                setTeams([]);
+            }
+        } catch (error) {
+            console.error("Error fetching teams:", error);
+            setTeams([]);
+        }
+    };
+
+    const generateVisualization = async () => {
+        if (!selectedConference) return;
+
+        setLoading(true);
+        try {
+            const queryParams = new URLSearchParams({
+                conferenceId: selectedConference,
+                startYear: seasonRange[0],
+                endYear: seasonRange[1]
+            });
+
+            if (selectedTeam) {
+                queryParams.append('teamId', selectedTeam);
+            }
+
+            console.log("Fetching data with params:", queryParams.toString());
+            const response = await fetch(`/api/conference-evolution?${queryParams}`);
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch visualization data');
+            }
+
+            const data = await response.json();
+            console.log("Visualization data received:", data);
+            setVisualizationData(data);
+        } catch (error) {
+            console.error('Error fetching visualization data:', error);
+            setVisualizationData(null);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSeasonChange = (event, newValue) => {
         setSeasonRange(newValue);
@@ -14,31 +109,25 @@ function ConferenceClash() {
 
     const handleConferenceChange = (event) => {
         setSelectedConference(event.target.value);
+        setSelectedTeam('');
+        setVisualizationData(null);
     };
 
-    const handleAnalysisTypeChange = (event) => {
-        setAnalysisType(event.target.value);
+    const handleTeamChange = (event) => {
+        setSelectedTeam(event.target.value);
+        setVisualizationData(null);
     };
 
     const handleReset = () => {
-        setSeasonRange([4, 24]);
+        setSeasonRange([2004, 2024]);
         setSelectedConference('');
+        setSelectedTeam('');
         setVisualizationData(null);
-        setAnalysisType('offensive');
-    };
-
-    const generateVisualization = () => {
-        console.log('Generating visualization with:', {
-            seasonRange,
-            analysisType,
-            conference: selectedConference
-        });
     };
 
     return (
         <Box sx={{ minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
             <Header />
-
             <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                 <Box sx={{ textAlign: 'center', mb: 4 }}>
                     <Typography
@@ -67,140 +156,29 @@ function ConferenceClash() {
                     >
                         Offensive Evolution
                     </Typography>
-                    <Typography
-                        variant="subtitle1"
-                        sx={{
-                            color: '#3F4C64',
-                            maxWidth: '600px',
-                            margin: '0 auto',
-                            fontSize: '1.1rem',
-                            lineHeight: 1.5,
-                            opacity: 0.9
-                        }}
-                    >
-                        Examining the evolution of offensive and defensive metrics within conferences
-                    </Typography>
                 </Box>
-
-                <Paper
-                    elevation={2}
-                    sx={{
-                        p: 4,
-                        mb: 4,
-                        backgroundColor: 'white'
-                    }}
-                >
-                    <Typography
-                        variant="h6"
-                        component="h3"
-                        sx={{
-                            mb: 2,
-                            color: '#212D40'
-                        }}
-                    >
+                <Paper elevation={2} sx={{ p: 4, mb: 4, backgroundColor: 'white' }}>
+                    <Typography variant="h6" component="h3" sx={{ mb: 2, color: '#212D40' }}>
                         Select the range of seasons to visualize
                     </Typography>
 
                     <Box sx={{ mb: 4 }}>
-                        <Box
+                        <Slider
+                            value={seasonRange}
+                            onChange={handleSeasonChange}
+                            valueLabelDisplay="auto"
+                            min={2004}
+                            max={2024}
                             sx={{
-                                px: 2,
-                                position: 'relative',
-                                mb: 1
-                            }}
-                        >
-                            <Slider
-                                value={seasonRange}
-                                onChange={handleSeasonChange}
-                                valueLabelDisplay="auto"
-                                min={4}
-                                max={24}
-                                valueLabelFormat={(value) => `20${value.toString().padStart(2, '0')}`}
-                                sx={{
-                                    color: '#3F4C64',
-                                    '& .MuiSlider-thumb': {
-                                        '&:hover, &.Mui-focusVisible': {
-                                            boxShadow: '0 0 0 8px rgba(63, 76, 100, 0.16)'
-                                        }
-                                    },
-                                    '& .MuiSlider-rail': {
-                                        backgroundColor: '#e0e0e0'
-                                    },
-                                    '& .MuiSlider-valueLabel': {
-                                        backgroundColor: '#212D40'
+                                color: '#3F4C64',
+                                '& .MuiSlider-thumb': {
+                                    '&:hover': {
+                                        boxShadow: '0 0 0 8px rgba(63, 76, 100, 0.16)'
                                     }
-                                }}
-                            />
-                        </Box>
-
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                px: 2,
-                                width: '100%'
+                                }
                             }}
-                        >
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: '#3F4C64',
-                                    fontWeight: 500,
-                                    position: 'relative',
-                                    left: '2px'
-                                }}
-                            >
-                                04'
-                            </Typography>
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: '#3F4C64',
-                                    fontWeight: 500,
-                                    position: 'relative',
-                                    right: '2px'
-                                }}
-                            >
-                                24'
-                            </Typography>
-                        </Box>
+                        />
                     </Box>
-
-                    <FormControl component="fieldset" sx={{ mb: 3 }}>
-                        <RadioGroup
-                            row
-                            name="analysis-type"
-                            value={analysisType}
-                            onChange={handleAnalysisTypeChange}
-                        >
-                            <FormControlLabel
-                                value="offensive"
-                                control={
-                                    <Radio
-                                        sx={{
-                                            '&.Mui-checked': {
-                                                color: '#3F4C64',
-                                            }
-                                        }}
-                                    />
-                                }
-                                label="Offensive"
-                            />
-                            <FormControlLabel
-                                value="defensive"
-                                control={
-                                    <Radio
-                                        sx={{
-                                            '&.Mui-checked': {
-                                                color: '#3F4C64',
-                                            }
-                                        }}
-                                    />
-                                }
-                                label="Defensive"
-                            />
-                        </RadioGroup>
-                    </FormControl>
 
                     <Box sx={{ mb: 3 }}>
                         <Typography sx={{ mb: 1, color: '#212D40' }}>
@@ -211,11 +189,37 @@ function ConferenceClash() {
                             value={selectedConference}
                             onChange={handleConferenceChange}
                             displayEmpty
-                            sx={{ backgroundColor: 'white' }}
+                            sx={{ backgroundColor: 'white', mb: 2 }}
                         >
                             <MenuItem value="">
                                 <em>Select a conference...</em>
                             </MenuItem>
+                            {conferences.map((conference) => (
+                                <MenuItem key={conference.conferenceId} value={conference.conferenceId}>
+                                    {conference.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+
+                        <Typography sx={{ mb: 1, color: '#212D40' }}>
+                            Team Selection (Optional)
+                        </Typography>
+                        <Select
+                            fullWidth
+                            value={selectedTeam}
+                            onChange={handleTeamChange}
+                            displayEmpty
+                            disabled={!selectedConference}
+                            sx={{ backgroundColor: 'white' }}
+                        >
+                            <MenuItem value="">
+                                <em>All Teams in Conference</em>
+                            </MenuItem>
+                            {teams.map((team) => (
+                                <MenuItem key={team.teamId} value={team.teamId}>
+                                    {team.school}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </Box>
 
@@ -223,14 +227,13 @@ function ConferenceClash() {
                         <Button
                             variant="contained"
                             onClick={generateVisualization}
+                            disabled={!selectedConference || loading}
                             sx={{
                                 backgroundColor: '#212D40',
-                                '&:hover': {
-                                    backgroundColor: '#3F4C64'
-                                }
+                                '&:hover': { backgroundColor: '#3F4C64' }
                             }}
                         >
-                            Generate Visualization
+                            {loading ? 'Loading...' : 'Generate Visualization'}
                         </Button>
                         <Button
                             variant="outlined"
@@ -253,19 +256,25 @@ function ConferenceClash() {
                     elevation={2}
                     sx={{
                         p: 4,
-                        height: '400px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        minHeight: '500px',
                         backgroundColor: 'white'
                     }}
                 >
-                    {!visualizationData ? (
-                        <Typography color="text.secondary">
-                            Select a conference and generate visualization
-                        </Typography>
+                    {loading ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+                            <Typography>Loading visualization...</Typography>
+                        </Box>
+                    ) : !visualizationData ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+                            <Typography>Select a conference and generate visualization</Typography>
+                        </Box>
                     ) : (
-                        <Box>Visualization will go here</Box>
+                        <>
+                            <Typography variant="h6" sx={{ mb: 2, textAlign: 'center', color: '#212D40' }}>
+                                {selectedTeam ? 'Team Performance Evolution' : 'Conference Performance Evolution'}
+                            </Typography>
+                            <ConferenceEvolutionVisualization data={visualizationData} />
+                        </>
                     )}
                 </Paper>
             </Container>

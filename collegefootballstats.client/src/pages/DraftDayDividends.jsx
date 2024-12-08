@@ -1,11 +1,35 @@
 import { Box, Container, Typography, Slider, Select, MenuItem, Button, Paper } from '@mui/material';
 import Header from '../components/Header';
-import { useState } from 'react';
+import DraftDayDividendsVisualization from '../components/DraftDayDividendsVisualization';
+import { useState, useEffect } from 'react';
 
 function DraftDayDividends() {
-    const [seasonRange, setSeasonRange] = useState([4, 24]);
+    const [seasonRange, setSeasonRange] = useState([2010, 2024]);
     const [selectedPosition, setSelectedPosition] = useState('');
+    const [positions, setPositions] = useState([]);
     const [visualizationData, setVisualizationData] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        fetchPositions();
+    }, []);
+
+    const fetchPositions = async () => {
+        try {
+            const response = await fetch('/api/player-positions');
+            const data = await response.json();
+            console.log('Positions fetched:', data);
+            if (Array.isArray(data)) {
+                setPositions(data);
+            } else {
+                console.warn('Unexpected positions response format', data);
+                setPositions([]);
+            }
+        } catch (error) {
+            console.error('Error fetching positions:', error);
+            setPositions([]);
+        }
+    };
 
     const handleSeasonChange = (event, newValue) => {
         setSeasonRange(newValue);
@@ -16,16 +40,38 @@ function DraftDayDividends() {
     };
 
     const handleReset = () => {
-        setSeasonRange([4, 24]);
+        setSeasonRange([2010, 2024]);
         setSelectedPosition('');
         setVisualizationData(null);
     };
 
-    const generateVisualization = () => {
-        console.log('Generating visualization with:', {
-            seasonRange,
-            position: selectedPosition
-        });
+    const generateVisualization = async () => {
+        if (!selectedPosition) return;
+
+        setLoading(true);
+        try {
+            const queryParams = new URLSearchParams({
+                position: selectedPosition,
+                startYear: seasonRange[0],
+                endYear: seasonRange[1]
+            });
+
+            console.log("Fetching data with params:", queryParams.toString());
+            const response = await fetch(`/api/player-performance-by-position?${queryParams}`);
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch visualization data');
+            }
+
+            const data = await response.json();
+            console.log("Visualization data received:", data);
+            setVisualizationData(data);
+        } catch (error) {
+            console.error('Error fetching visualization data:', error);
+            setVisualizationData(null);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -106,9 +152,9 @@ function DraftDayDividends() {
                                 value={seasonRange}
                                 onChange={handleSeasonChange}
                                 valueLabelDisplay="auto"
-                                min={4}
-                                max={24}
-                                valueLabelFormat={(value) => `20${value.toString().padStart(2, '0')}`}
+                                min={2010}
+                                max={2024}
+                                valueLabelFormat={(value) => `${value}`}
                                 sx={{
                                     color: '#3F4C64',
                                     '& .MuiSlider-thumb': {
@@ -143,7 +189,6 @@ function DraftDayDividends() {
                                     left: '2px'
                                 }}
                             >
-                                04'
                             </Typography>
                             <Typography
                                 variant="body2"
@@ -154,7 +199,6 @@ function DraftDayDividends() {
                                     right: '2px'
                                 }}
                             >
-                                24'
                             </Typography>
                         </Box>
                     </Box>
@@ -173,6 +217,17 @@ function DraftDayDividends() {
                             <MenuItem value="">
                                 <em>Select a position...</em>
                             </MenuItem>
+                            {positions.length > 0 ? (
+                                positions.map((position) => (
+                                    <MenuItem key={position.position} value={position.position}>
+                                        {position.position}
+                                    </MenuItem>
+                                ))
+                            ) : (
+                                <MenuItem disabled>
+                                    <em>Loading positions...</em>
+                                </MenuItem>
+                            )}
                         </Select>
                     </Box>
 
@@ -180,6 +235,7 @@ function DraftDayDividends() {
                         <Button
                             variant="contained"
                             onClick={generateVisualization}
+                            disabled={!selectedPosition || loading}
                             sx={{
                                 backgroundColor: '#212D40',
                                 '&:hover': {
@@ -187,7 +243,7 @@ function DraftDayDividends() {
                                 }
                             }}
                         >
-                            Generate Visualization
+                            {loading ? 'Loading...' : 'Generate Visualization'}
                         </Button>
                         <Button
                             variant="outlined"
@@ -210,19 +266,21 @@ function DraftDayDividends() {
                     elevation={2}
                     sx={{
                         p: 4,
-                        height: '400px',
+                        height: '500px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         backgroundColor: 'white'
                     }}
                 >
-                    {!visualizationData ? (
+                    {loading ? (
+                        <Typography>Loading visualization...</Typography>
+                    ) : !visualizationData ? (
                         <Typography color="text.secondary">
                             Select a position and generate visualization
                         </Typography>
                     ) : (
-                        <Box>Visualization will go here</Box>
+                        <DraftDayDividendsVisualization data={visualizationData} />
                     )}
                 </Paper>
             </Container>

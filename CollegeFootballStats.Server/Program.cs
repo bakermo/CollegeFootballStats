@@ -3,6 +3,12 @@ using CollegeFootballStats.Core.Models;
 using CollegeFootballStats.Core;
 using Dapper;
 using CollegeFootballStats.Server;
+using Oracle.ManagedDataAccess.Client;
+using System.Data.SqlClient;
+using System.Data;
+using Microsoft.AspNetCore.Mvc;
+using CollegeFootballStats.Core.Models;
+using CollegeFootballStats.Core.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,43 +71,229 @@ app.MapGet("/team/{abbreviation}", async(SqlCommandManager queryManager, string 
     return Results.Ok(team);
 });
 
+app.MapGet("/team-recruiting-draft-data", async (SqlCommandManager queryManager, int startYear, int endYear) =>
+{
+    var query = new GetTeamRecruitingAndDraft(startYear, endYear);
+
+    var data = await queryManager.QueryAsync<TeamRecruitingAndDraftResult>(query);
+    return Results.Ok(data);
+});
+
+app.MapGet("/teams/draft-performance", async (SqlCommandManager queryManager, int teamId, int conferenceId, int startSeason, int endSeason) =>
+{
+    ISqlCommand query = new GetTeamDraftPerformance(teamId, conferenceId, startSeason, endSeason);
+    var result = await queryManager.QueryAsync<TeamDraftPerformance>(query);
+    return Results.Ok(result);
+});
+
+
 app.MapGet("/tuples", async (SqlCommandManager queryManager) => {
-    // yes. This is inefficient. Yes. there is a better way to do this in one query
-    // but right now im tired and don't care
+    var tableNames = new[]
+    {
+        "TEAM", "COACH", "COACHINGRECORD", "CONFERENCE", "CONFERENCEMEMBERSHIP",
+        "DRAFTPICK", "GAME", "ROSTER", "PLAYER", "PLAYERGAMESTAT",
+        "PLAYERSEASONSTAT", "POLL", "STATCATEGORY", "STATTYPE", "TEAMGAMESTAT", "RECRUITINGPLAYERS"
+    };
+
     var response = new TupleCount();
-    response.Teams = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("TEAM"));
-    response.Coaches = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("COACH"));
-    response.CoachingRecords = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("COACHINGRECORD"));
-    response.Conferences = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("CONFERENCE"));
-    response.ConferenceMemberships = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("CONFERENCEMEMBERSHIP"));
-    response.DraftPicks = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("DRAFTPICK"));
-    response.Games = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("GAME"));
-    response.Rosters = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("ROSTER"));
-    response.Players = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("PLAYER"));
-    response.PlayerGameStats = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("PLAYERGAMESTAT"));
-    response.PlayerSeasonStats = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("PLAYERSEASONSTAT"));
-    response.Polls = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("POLL"));
-    response.StatCategories = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("STATCATEGORY"));
-    response.StatTypes = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("STATTYPE"));
-    response.TeamGameStats = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable("TEAMGAMESTAT"));
-    response.TotalTuples = 
-        response.Teams + 
-        response.Coaches + 
-        response.CoachingRecords + 
-        response.Conferences + 
-        response.ConferenceMemberships + 
-        response.DraftPicks + 
-        response.Games + 
-        response.Rosters + 
-        response.Players + 
-        response.PlayerGameStats +
-        response.PlayerSeasonStats +
-        response.Polls +
-        response.StatCategories +
-        response.StatTypes +
-        response.TeamGameStats;
+    var results = new List<int>();
+
+    foreach (var tableName in tableNames)
+    {
+        var count = await queryManager.QueryFirstOrDefault<int>(new CountTuplesByTable(tableName));
+        results.Add(count);
+    }
+
+    response.Teams = results[0];
+    response.Coaches = results[1];
+    response.CoachingRecords = results[2];
+    response.Conferences = results[3];
+    response.ConferenceMemberships = results[4];
+    response.DraftPicks = results[5];
+    response.Games = results[6];
+    response.Rosters = results[7];
+    response.Players = results[8];
+    response.PlayerGameStats = results[9];
+    response.PlayerSeasonStats = results[10];
+    response.Polls = results[11];
+    response.StatCategories = results[12];
+    response.StatTypes = results[13];
+    response.TeamGameStats = results[14];
+    response.RecruitingPlayers = results[15];
+
+    response.TotalTuples = results.Sum();
 
     return Results.Ok(response);
+});
+
+app.MapGet("/players", async (SqlCommandManager queryManager) =>
+{
+    ISqlCommand query = new GetAllPlayers();
+    var players = await queryManager.QueryAsync<Player>(query);
+    return Results.Ok(players.ToList());
+});
+
+app.MapGet("/players/{search}", async (SqlCommandManager queryManager, string search) =>
+{
+    ISqlCommand query = new GetPlayerSearch(search);
+    var result = await queryManager.QueryAsync<Player>(query);
+    return Results.Ok(result);
+});
+
+app.MapGet("/players/type", async (SqlCommandManager queryManager, [FromQuery] string teamID, [FromQuery] string name) =>
+{
+    ISqlCommand query = name switch
+    {
+        "offensive" => new GetPlayersOffensive(teamID),
+        "defensive" => new GetPlayersDefensive(teamID),
+        "specialTeams" => new GetPlayersSpecialTeams(teamID),
+        _ => throw new ArgumentException("Invalid player type", nameof(name))
+    };
+
+    var result = await queryManager.QueryAsync<Player>(query);
+    return Results.Ok(result);
+});
+
+
+app.MapPost("/player-impact", async (SqlCommandManager queryManager, string teamID, string playerID, string startYear, string endYear, string statType,
+    string statCategory, string compOperator, int compValue) =>
+{
+    ISqlCommand query = new PlayerImpact(teamID, playerID, startYear, endYear, statType, statCategory, compOperator, compValue);
+    var result = await queryManager.QueryAsync<PlayerImpactResult>(query);
+    return Results.Ok(result);
+});
+
+
+app.MapGet("/statTypes", async (SqlCommandManager queryManager, [FromQuery] string playerID) =>
+{
+    ISqlCommand query = new GetPlayerStatTypes(playerID);
+    var result = await queryManager.QueryAsync<StatType>(query);
+    return Results.Ok(result);
+});
+
+app.MapGet("/statCategories", async (SqlCommandManager queryManager, [FromQuery] string playerID, string statType) =>
+{
+    ISqlCommand query = new GetPlayerStatCategories(playerID, statType);
+    var result = await queryManager.QueryAsync<StatCategory>(query);
+    return Results.Ok(result);
+});
+
+app.MapGet("/conferences", async (SqlCommandManager queryManager) =>
+{
+    ISqlCommand query = new GetAllConferences();
+    var conferences = await queryManager
+        .QueryAsync<Conference>(query);
+
+    return Results.Ok(conferences.ToList());
+});
+
+app.MapGet("/coaches", async (SqlCommandManager queryManager) =>
+{
+    ISqlCommand query = new GetAllCoaches();
+    var coaches = await queryManager
+        .QueryAsync<Coach>(query);
+
+    return Results.Ok(coaches.ToList());
+});
+
+app.MapGet("/coaches/{teamID}", async (SqlCommandManager queryManager, int teamID) =>
+{
+    ISqlCommand query = new GetCoachesByTeam(teamID);
+    var coaches = await queryManager
+        .QueryAsync<Coach>(query);
+
+    return Results.Ok(coaches.ToList());
+});
+
+
+app.MapGet("/coaching-impact", async (SqlCommandManager queryManager, string teamId, string coachId, string startYear, string endYear) =>
+{
+    ISqlCommand query = new CoachingImpact(teamId, coachId, startYear, endYear);
+    var result = await queryManager.QueryAsync<CoachingImpactResult>(query);
+    return Results.Ok(result);
+});
+
+app.MapGet("/player-positions", async (SqlCommandManager queryManager) =>
+{
+    var query = new GetAllPlayerPositions();
+    var result = await queryManager.QueryAsync<PlayerPosition>(query);
+    return Results.Ok(result);
+});
+
+// For the ConferenceClash page woo
+app.MapGet("/conference-evolution", async (
+    SqlCommandManager queryManager,
+    [FromQuery] int conferenceId,
+    [FromQuery] int? teamId,
+    [FromQuery] int startYear,
+    [FromQuery] int endYear) =>
+{
+    try
+    {
+        var query = new GetConferenceEvolution(conferenceId, teamId, startYear, endYear);
+        var result = await queryManager.QueryAsync<ConferenceEvolutionResult>(query);
+
+        if (!result.Any())
+        {
+            return Results.NotFound("No data found for the specified parameters");
+        }
+
+        return Results.Ok(result);
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"Error in conference-evolution endpoint: {ex}");
+        return Results.Problem("Error fetching conference evolution data");
+    }
+})
+.WithName("GetConferenceEvolution")
+.WithOpenApi(operation =>
+{
+    operation.Summary = "Get conference offensive/defensive performance evolution";
+    operation.Description = "Retrieves points scored and allowed per game over time for a conference or specific team";
+    return operation;
+});
+
+app.MapGet("/teams/conference/{conferenceId}", async (SqlCommandManager queryManager, int conferenceId) =>
+{
+    try
+    {
+        var query = new GetTeamsByConference(conferenceId);
+        var teams = await queryManager.QueryAsync<Team>(query);
+
+        if (!teams.Any())
+        {
+            return Results.NotFound($"No teams found for conference ID: {conferenceId}");
+        }
+
+        return Results.Ok(teams);
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"Error fetching teams by conference: {ex}");
+        return Results.Problem("Error fetching teams");
+    }
+})
+.WithName("GetTeamsByConference")
+.WithOpenApi(operation =>
+{
+    operation.Summary = "Get teams by conference";
+    operation.Description = "Returns all teams currently in the specified conference";
+    return operation;
+});
+
+app.MapGet("/player-performance-by-position", async (SqlCommandManager queryManager, [FromQuery] string position, [FromQuery] int startYear, [FromQuery] int endYear) =>
+{
+    var query = new PlayerPerformanceByPosition(position, startYear, endYear);
+    var result = await queryManager.QueryAsync<PercentilePerformanceResult>(query);
+    return Results.Ok(result);
+});
+
+app.MapGet("/recruit-influence", async (SqlCommandManager queryManager, [FromQuery] string conferenceId, [FromQuery] string? teamId, [FromQuery] string startYear, [FromQuery] string endYear) =>
+{
+    var query = new TeamRecruitingImpact(conferenceId, teamId, startYear, endYear);
+    var result = await queryManager.QueryAsync<TeamRecruitingImpactResult>(query);
+    return Results.Ok(result);
 });
 
 app.MapFallbackToFile("/index.html");

@@ -214,4 +214,15 @@ namespace CollegeFootballStats.Importer
         public string Name { get; set; } = string.Empty;
         public string Stat { get; set; } = string.Empty;
     }
+
+    internal class RecruitingPlayerResponse
+    {
+        public int? AthleteID { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public int Year { get; set; }
+        public int? Ranking { get; set; }
+        public string CommittedTo { get; set; } = string.Empty;
+        public int Stars { get; set; }
+        public decimal Rating { get; set; }
+    }
 }
