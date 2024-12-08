@@ -155,7 +155,7 @@ app.MapGet("/players/type", async (SqlCommandManager queryManager, [FromQuery] s
 });
 
 
-app.MapPost("/player-impact", async (SqlCommandManager queryManager, string teamID, string playerID, string startYear, string endYear, string statType,
+app.MapGet("/player-impact", async (SqlCommandManager queryManager, string teamID, string playerID, string startYear, string endYear, string statType,
     string statCategory, string compOperator, int compValue) =>
 {
     ISqlCommand query = new PlayerImpact(teamID, playerID, startYear, endYear, statType, statCategory, compOperator, compValue);

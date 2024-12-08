@@ -227,7 +227,7 @@ function GameChangers() {
             console.log("getting response...");
 
             const response = await fetch(`/api/player-impact?${params.toString()}`, {
-                method: 'POST',  // Use POST method for sending data
+                method: 'GET',  // Use GET method for retrieving the data
             });
 
             console.log("got response?", response);

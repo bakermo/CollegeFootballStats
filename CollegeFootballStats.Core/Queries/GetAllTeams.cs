@@ -6,6 +6,7 @@
             SELECT
                 *   
             FROM    
-                Team t";
+                Team t
+    ORDER BY t.School ASC";
     }
 }
