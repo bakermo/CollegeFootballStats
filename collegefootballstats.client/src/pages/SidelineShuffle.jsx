@@ -5,16 +5,29 @@ import CoachingImpactVisualization from '../components/CoachingImpactVisualizati
 
 function SidelineShuffle() {
     const [seasonRange, setSeasonRange] = useState([2004, 2024]);
+    const [selectedConference, setSelectedConference] = useState('');
     const [selectedTeam, setSelectedTeam] = useState('');
     const [selectedCoach, setSelectedCoach] = useState('');
+    const [conferences, setConferences] = useState([]);
     const [teams, setTeams] = useState([]);
     const [coaches, setCoaches] = useState([]);
     const [visualizationData, setVisualizationData] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    // Fetch conferences on component mount
     useEffect(() => {
-        fetchTeams();
+        fetchConferences();
     }, []);
+
+    // Fetch teams when conference is selected
+    useEffect(() => {
+        if (selectedConference) {
+            fetchTeams();
+        } else {
+            setTeams([]);
+            setSelectedTeam('');
+        }
+    }, [selectedConference]);
 
     useEffect(() => {
         if (selectedTeam) {
@@ -24,14 +37,35 @@ function SidelineShuffle() {
         }
     }, [selectedTeam]);
 
+    const fetchConferences = async () => {
+        try {
+            const response = await fetch("/api/conferences");
+            const data = await response.json();
+            console.log("Fetched conferences:", data);
+            setConferences(data);
+        } catch (error) {
+            console.error("Error fetching conferences:", error);
+        }
+    };
+
     const fetchTeams = async () => {
         try {
-            const response = await fetch('/api/teams');
-            const data = await response.json();
-            console.log('Teams fetched:', data);
-            setTeams(data);
+            if (selectedConference) {
+                console.log("Fetching teams for conference:", selectedConference);
+                const response = await fetch(`/api/teams/conference/${selectedConference}`);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch teams');
+                }
+
+                const data = await response.json();
+                console.log("Fetched teams:", data);
+                setTeams(data);
+            } else {
+                setTeams([]);
+            }
         } catch (error) {
-            console.error('Error fetching teams:', error);
+            console.error("Error fetching teams:", error);
             setTeams([]);
         }
     };
@@ -52,6 +86,12 @@ function SidelineShuffle() {
         setSeasonRange(newValue);
     };
 
+    const handleConferenceChange = (event) => {
+        setSelectedConference(event.target.value);
+        setSelectedTeam('');
+        setVisualizationData(null);
+    };
+
     const handleTeamChange = (event) => {
         setSelectedTeam(event.target.value);
         setSelectedCoach('');
@@ -66,12 +106,13 @@ function SidelineShuffle() {
     const handleReset = () => {
         setSeasonRange([2004, 2024]);
         setSelectedTeam('');
+        setSelectedConference('')
         setSelectedCoach('');
         setVisualizationData(null);
     };
 
     const generateVisualization = async () => {
-        if (!selectedTeam || !selectedCoach) return;
+        if (!selectedConference || !selectedTeam || !selectedCoach) return;
 
         setLoading(true);
         try {
@@ -220,12 +261,35 @@ function SidelineShuffle() {
 
                     <Box sx={{ mb: 3 }}>
                         <Typography sx={{ mb: 1, color: '#212D40' }}>
+                            Conference Selection
+                        </Typography>
+                        <Select
+                            fullWidth
+                            value={selectedConference}
+                            onChange={handleConferenceChange}
+                            displayEmpty
+                            sx={{ backgroundColor: 'white', mb: 2 }}
+                        >
+                            <MenuItem value="">
+                                <em>Select a conference...</em>
+                            </MenuItem>
+                            {conferences.map((conference) => (
+                                <MenuItem key={conference.conferenceId} value={conference.conferenceId}>
+                                    {conference.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </Box>
+
+                    <Box sx={{ mb: 3 }}>
+                        <Typography sx={{ mb: 1, color: '#212D40' }}>
                             Select Team
                         </Typography>
                         <Select
                             fullWidth
                             value={selectedTeam}
                             onChange={handleTeamChange}
+                            disabled={!selectedConference}
                             displayEmpty
                             sx={{ backgroundColor: 'white' }}
                         >
@@ -248,6 +312,7 @@ function SidelineShuffle() {
                             fullWidth
                             value={selectedCoach}
                             onChange={handleCoachChange}
+                            disabled={!selectedConference || !selectedTeam}
                             displayEmpty
                             sx={{ backgroundColor: 'white' }}
                         >
@@ -266,7 +331,7 @@ function SidelineShuffle() {
                         <Button
                             variant="contained"
                             onClick={generateVisualization}
-                            disabled={!selectedTeam || !selectedCoach || loading}
+                            disabled={!selectedConference || !selectedTeam || !selectedCoach || loading}
                             sx={{
                                 backgroundColor: '#212D40',
                                 '&:hover': { backgroundColor: '#3F4C64' }
